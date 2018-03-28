@@ -43,10 +43,6 @@
                             providerData: providerData
                         }, null, '  ');
                     });
-
-                    firebase.database().ref("/users/"+uid).on("value", function(snap){
-                        alert(snap.val().name);
-                    });
                 } else {
                     // User is signed out.
                     document.getElementById('sign-in-status').textContent = 'Signed out';
@@ -60,6 +56,10 @@
 
         window.addEventListener('load', function () {
             initApp()
+        });
+
+        $("#sign-in").click(function () {
+            firebase.auth().signOut();
         });
     </script>
 </head>
