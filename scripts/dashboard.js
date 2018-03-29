@@ -108,4 +108,9 @@ $('#deleteModal').on('show.bs.modal', function (event) {
     // set the correct data attribute and class to target deletion
     modal.find('.btn-primary').attr("data-id", id).addClass("delete-team");
 })
+
+// give focus to the delete button once modal loads
+$('#deleteModal').on('shown.bs.modal', function(event){
+    $(this).find('.btn-primary').trigger('focus');
+})
 //#endregion
