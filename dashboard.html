@@ -26,7 +26,7 @@
                 uid = user.uid;
                 $("#user-info").text(user.displayName + " (" + user.email + ")");
             }
-            
+
             firebase.auth().onAuthStateChanged(function (user) {
                 if (user) {
                     // User is signed in.
@@ -51,7 +51,7 @@
     <div class="jumbotron text-center">
         <h1>Trivia Master Console - Dashboard</h1>
         <p>Logged in as
-            <span class="user-info"></span>
+            <span id="user-info"></span>
         </p>
         <p class="lead">
             <a class="btn btn-primary btn-lg" href="#" role="button" id="logout">Log out</a>
