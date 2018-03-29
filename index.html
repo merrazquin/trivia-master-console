@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sample FirebaseUI App</title>
+    <title>Trivia Master Console - Login</title>
 
     <!-- jQuery & Popper -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -27,14 +27,14 @@
     <script type="text/javascript">
         // FirebaseUI config.
         var uiConfig = {
-            signInSuccessUrl: 'index.html',
+            signInSuccessUrl: 'dashboard.html',
             signInOptions: [
                 // Leave the lines as is for the providers you want to offer your users.
                 firebase.auth.GoogleAuthProvider.PROVIDER_ID,
                 firebase.auth.EmailAuthProvider.PROVIDER_ID,
             ],
             // Terms of service url.
-            tosUrl: 'index.html' // TODO: update
+            tosUrl: 'dashboard.html' // TODO: update
         };
 
         // Initialize the FirebaseUI Widget using Firebase.
