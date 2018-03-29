@@ -1,16 +1,17 @@
 var uid;
 var initApp = function () {
-    if (firebase.auth().currentUser) {
-        var user = firebase.auth().currentUser;
-        uid = user.uid;
-        $("#user-info").text(user.displayName + " (" + user.email + ")");
-    }
-
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
             uid = user.uid;
             $("#user-info").text(user.displayName + " (" + user.email + ")");
+
+            try { onAuth(user); }
+            catch (e) {
+                if (e.name != "ReferenceError") {
+                    console.log("Error:", e);
+                }
+            }
         } else {
             // User is signed out, redirect to login page
             window.location.replace("index.html");
@@ -32,3 +33,12 @@ $("#logout").click(() => {
         console.error('Sign Out Error', error);
     });
 });
+
+//#region Helper Functions
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+//#endregion

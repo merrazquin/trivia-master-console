@@ -93,7 +93,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="card-body team-list">
+                    <div class="card-body">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -103,24 +103,31 @@
                                     <th>Delete</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <th>Dummy Team</th>
-                                    <td>53</td>
-                                    <td>
-                                        <button class="btn btn-default edit-team">
-                                            <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-default delete-team">
-                                            <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
-                                        </button>
-                                    </td>
-                                </tr>
+                            <tbody id="team-list">
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <span id="delete-type"></span> '<span id="delete-name"></span>'?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
                 </div>
             </div>
         </div>
