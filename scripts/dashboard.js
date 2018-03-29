@@ -26,11 +26,11 @@ function deleteTeam() {
     console.log("deleteTeam not yet implemented");
 }
 
-$(document).on("click", ".add-round", createRound)
+$(document).on("click", ".add-round", addRound)
     .on("click", ".edit-round", editRound)
     .on("click", ".delete-round", deleteRound)
     .on("click", ".run-round", deleteRound)
-    .on("click", ".add-team", createTeam)
+    .on("click", ".add-team", addTeam)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
 ;
