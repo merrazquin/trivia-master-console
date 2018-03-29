@@ -5,31 +5,25 @@
     <meta charset="UTF-8">
     <title>Sample FirebaseUI App</title>
 
+    <!-- jQuery & Popper -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
 
+    <!-- Bootstrap CSS & JS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
-    <script>
-        // Initialize Firebase
-        var config = {
-            apiKey: "AIzaSyC4uRR38L_nrqTz0CR636MT3tsq7J4E8XA",
-            authDomain: "trivia-master-console.firebaseapp.com",
-            databaseURL: "https://trivia-master-console.firebaseio.com",
-            projectId: "trivia-master-console",
-            storageBucket: "trivia-master-console.appspot.com",
-            messagingSenderId: "1019033614397"
-        };
-        firebase.initializeApp(config);
-    </script>
-    <script src="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.js"></script>
+    <!-- Firebase CSS -->
     <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.css" />
+
+    <!-- Firebase, Firebase init, and firebase UI -->
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <script src="scripts/firebase-init.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.js"></script>
     <script type="text/javascript">
         // FirebaseUI config.
         var uiConfig = {
@@ -40,7 +34,7 @@
                 firebase.auth.EmailAuthProvider.PROVIDER_ID,
             ],
             // Terms of service url.
-            tosUrl: '<your-tos-url>'
+            tosUrl: 'index.html' // TODO: update
         };
 
         // Initialize the FirebaseUI Widget using Firebase.
@@ -51,8 +45,6 @@
 </head>
 
 <body>
-    <!-- The surrounding HTML is left untouched by FirebaseUI.
-         Your app may use that space for branding, controls and other customizations.-->
     <div class="jumbotron text-center">
         <h1>Trivia Master Console</h1>
     </div>

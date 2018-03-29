@@ -14,74 +14,162 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 
-        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <script src="scripts/firebase-init.js"></script>
     <script>
-        // Initialize Firebase
-        var config = {
-            apiKey: "AIzaSyC4uRR38L_nrqTz0CR636MT3tsq7J4E8XA",
-            authDomain: "trivia-master-console.firebaseapp.com",
-            databaseURL: "https://trivia-master-console.firebaseio.com",
-            projectId: "trivia-master-console",
-            storageBucket: "trivia-master-console.appspot.com",
-            messagingSenderId: "1019033614397"
-        };
-        firebase.initializeApp(config);
-    </script>
-    <script type="text/javascript">
-        initApp = function () {
-            firebase.auth().onAuthStateChanged(function (user) {
-                if (user) {
-                    // User is signed in.
-                    var displayName = user.displayName;
-                    var email = user.email;
-                    var emailVerified = user.emailVerified;
-                    var photoURL = user.photoURL;
-                    var uid = user.uid;
-                    var phoneNumber = user.phoneNumber;
-                    var providerData = user.providerData;
-                    user.getIdToken().then(function (accessToken) {
-                        document.getElementById('sign-in-status').textContent = 'Signed in';
-                        document.getElementById('sign-in').textContent = 'Sign out';
-                        document.getElementById('account-details').textContent = JSON.stringify({
-                            displayName: displayName,
-                            email: email,
-                            emailVerified: emailVerified,
-                            phoneNumber: phoneNumber,
-                            photoURL: photoURL,
-                            uid: uid,
-                            accessToken: accessToken,
-                            providerData: providerData
-                        }, null, '  ');
-                    });
-                } else {
-                    // User is signed out.
-                    document.getElementById('sign-in-status').textContent = 'Signed out';
-                    document.getElementById('sign-in').textContent = 'Sign in';
-                    document.getElementById('account-details').textContent = 'null';
-                }
-            }, function (error) {
-                console.log(error);
-            });
-        };
+        var initApp = function () {
+                firebase.auth().onAuthStateChanged(function (user) {
+                    if (user) {
+                        // User is signed in.
+                        var displayName = user.displayName;
+                        var email = user.email;
+                        var emailVerified = user.emailVerified;
+                        var photoURL = user.photoURL;
+                        var uid = user.uid;
+                        var phoneNumber = user.phoneNumber;
+                        var providerData = user.providerData;
+                        user.getIdToken().then(function (accessToken) {
+                            document.getElementById('sign-in-status').textContent = 'Signed in';
+                            document.getElementById('sign-in').textContent = 'Sign out';
+                            document.getElementById('account-details').textContent = JSON.stringify({
+                                displayName: displayName,
+                                email: email,
+                                emailVerified: emailVerified,
+                                phoneNumber: phoneNumber,
+                                photoURL: photoURL,
+                                uid: uid,
+                                accessToken: accessToken,
+                                providerData: providerData
+                            }, null, '  ');
+                        });
+                    } else {
+                        // User is signed out.
+                        document.getElementById('sign-in-status').textContent = 'Signed out';
+                        document.getElementById('sign-in').textContent = 'Sign in';
+                        document.getElementById('account-details').textContent = 'null';
+                    }
+                }, function (error) {
+                    console.log(error);
+                });
+            };
 
         window.addEventListener('load', function () {
-            initApp()
+            // initApp()
         });
 
-        $("#sign-in").click(function () {
+        /*$("#sign-in").click(function () {
             firebase.auth().signOut();
             this.text("sign in");
             $("#sign-in-status").text("signed out");
             $("#account-details").empty();
-        });
+        });*/
     </script>
 </head>
 
 <body>
-    <h1>Welcome to My Awesome App</h1>
-    <div id="sign-in-status"></div>
+    <div class="jumbotron text-center">
+        <h1>Trivia Master Console - Dashboard</h1>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Rounds -->
+            <div class="col-7">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Rounds</h3>
+                            <span class="col-4 text-right round-commands">
+                                <button class="btn btn-default add-round">
+                                    <span class="octicon octicon-plus"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table rounds-list">
+                            <thead>
+                                <tr>
+                                    <th>Round Name</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                    <th>Run</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Dummy Round</th>
+                                    <td>
+                                        <button class="btn btn-default">
+                                            <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-default">
+                                            <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-default">
+                                            <span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Teams -->
+            <div class="col-5">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Teams</h3>
+                            <span class="col-4 text-right team-commands">
+                                <button class="btn btn-default add-team">
+                                    <span class="octicon octicon-plus"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body team-list">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Team Name</th>
+                                    <th>Score</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Dummy Team</th>
+                                    <td>53</td>
+                                    <td>
+                                        <button class="btn btn-default">
+                                            <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-default">
+                                            <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div id="sign-in-status"></div>
     <div id="sign-in" style="cursor: pointer"></div>
-    <div id="account-details"></div>
+    <div id="account-details"></div> -->
 </body>
 
 </html>
