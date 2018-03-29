@@ -18,33 +18,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script src="scripts/firebase-init.js"></script>
-    <script>
-        var uid;
-        var initApp = function () {
-            if(firebase.auth().currentUser) {
-                var user = firebase.auth().currentUser;
-                uid = user.uid;
-                $("#user-info").text(user.displayName + " (" + user.email + ")");
-            }
-
-            firebase.auth().onAuthStateChanged(function (user) {
-                if (user) {
-                    // User is signed in.
-                    uid = user.uid;
-                    $("#user-info").text(user.displayName + " (" + user.email + ")");
-                } else {
-                    // User is signed out, redirect to login page
-                    window.location.replace("index.html");
-                }
-            }, function (error) {
-                console.log(error);
-            });
-        };
-
-        $(function () {
-            initApp()
-        });
-    </script>
 </head>
 
 <body>
@@ -87,17 +60,17 @@
                                 <tr>
                                     <th>Dummy Round</th>
                                     <td>
-                                        <button class="btn btn-default">
+                                        <button class="btn btn-default edit-round">
                                             <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
                                         </button>
                                     </td>
                                     <td>
-                                        <button class="btn btn-default">
+                                        <button class="btn btn-default delete-round">
                                             <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
                                         </button>
                                     </td>
                                     <td>
-                                        <button class="btn btn-default">
+                                        <button class="btn btn-default run-round">
                                             <span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>
                                         </button>
                                     </td>
@@ -135,12 +108,12 @@
                                     <th>Dummy Team</th>
                                     <td>53</td>
                                     <td>
-                                        <button class="btn btn-default">
+                                        <button class="btn btn-default edit-team">
                                             <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
                                         </button>
                                     </td>
                                     <td>
-                                        <button class="btn btn-default">
+                                        <button class="btn btn-default delete-team">
                                             <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
                                         </button>
                                     </td>
@@ -153,6 +126,7 @@
         </div>
     </div>
 
+    <script src="scripts/main.js"></script>
     <script src="scripts/dashboard.js"></script>
 </body>
 
