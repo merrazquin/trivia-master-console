@@ -67,9 +67,11 @@ function getUrlParameter(name) {
 //#region DB Functions
 var userRef;
 var teamRef;
+var roundsRef;
 var onAuth = function (user) {
     userRef = database.ref("/users/" + uid);
     teamRef = database.ref("/users/" + uid + "/teams");
+    roundsRef = database.ref("/users/" + uid + "/rounds");
 
     teamRef.on("child_added", function (childSnap) {
         var child = childSnap.val();
@@ -80,7 +82,7 @@ var onAuth = function (user) {
             .append(
                 $("<th>").text(child.name),
                 $("<td>").text(child.score),
-                $("<td>").append(editButton("edit-team")),
+                $("<td>").append(editButton(childSnap.key, "edit-team")),
                 $("<td>").append(deleteButton(childSnap.key))
             ).appendTo($("#team-list"));
     }, handleDatabaseError);
@@ -88,14 +90,35 @@ var onAuth = function (user) {
     teamRef.on("child_removed", function (childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
+
+
+    roundsRef.on("child_added", function (childSnap) {
+        var child = childSnap.val();
+        $("<tr>")
+            .attr("id", childSnap.key)
+            .addClass("round")
+            .append(
+                $("<th>").text(child.name),
+                $("<td>").append(editButton(childSnap.key, "edit-round")),
+                $("<td>").append(deleteButton(childSnap.key)),
+                $("<td>").append(runButton(childSnap.key, "run-round"))
+
+            ).appendTo($("#rounds-list"));
+
+    }, handleDatabaseError);
+
+    roundsRef.on("child_removed", function (childSnap) {
+        $("#" + childSnap.key).remove();
+    }, handleDatabaseError);
 }
 //#endregion
 
 //#region UI Builders
-function editButton(customClass) {
+function editButton(id, customClass) {
     var className = "btn btn-default";
     if (customClass) className += " " + customClass;
     return $("<button>")
+        .attr("data-id", id)
         .addClass(className)
         .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>')
         ;
@@ -107,16 +130,32 @@ function deleteButton(id, customClass) {
     return $("<button>")
         .attr("data-toggle", "modal")
         .attr("data-target", "#deleteModal")
-        .data("id", id)
+        .attr("data-id", id)
         .addClass(className)
         .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>')
         ;
+}
+
+function runButton(id, customClass) {
+    var className = "btn btn-default";
+    if (customClass) className += " " + customClass;
+    return $("<button>")
+        .attr("data-id", id)
+        .addClass(className)
+        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>')
+        ;
+
 }
 //#endregion
 
 //#region Main functionality
 function addRound() {
     console.log("addRound not yet implemented");
+    if (roundsRef) {
+        var round = roundsRef.push({ name: "some round" });
+
+        window.location.href = "create-round.html?id=" + round.key;
+    }
 }
 
 function editRound() {
@@ -124,18 +163,19 @@ function editRound() {
 }
 
 function deleteRound() {
-    console.log("deleteRound not yet implemented");
+    database.ref("/users/" + uid + "/rounds/" + $(this).attr("data-id")).remove();
 }
 
 function runRound() {
     console.log("runRound not yet implemented");
+    window.location.href = "run-round.html?id=" + $(this).attr("data-id");
 }
 
 function addTeam() {
     console.log("addTeam not yet fully implemented");
     console.log("adding team");
     if (teamRef) {
-        var team = teamRef.push({ name: "some team", score: Math.floor(Math.random() * 100) });
+        teamRef.push({ name: "some team", score: Math.floor(Math.random() * 100) });
     }
 }
 
@@ -152,14 +192,14 @@ function deleteTeam() {
 $(document).on("click", ".add-round", addRound)
     .on("click", ".edit-round", editRound)
     .on("click", ".delete-round", deleteRound)
-    .on("click", ".run-round", deleteRound)
+    .on("click", ".run-round", runRound)
     .on("click", ".add-team", addTeam)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
     ;
 
 $('#deleteModal').on('show.bs.modal', function (event) {
-    var id = $(event.relatedTarget).data("id");
+    var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
 
     var modal = $(this);
@@ -172,7 +212,7 @@ $('#deleteModal').on('show.bs.modal', function (event) {
     modal.find('#delete-name').text(row.find("th").text());
 
     // set the correct data attribute and class to target deletion
-    modal.find('.btn-primary').attr("data-id", id).addClass("delete-team");
+    modal.find('.btn-primary').attr("data-id", id).addClass(row.hasClass("team") ? "delete-team" : "delete-round");
 })
 
 // give focus to the delete button once modal loads
