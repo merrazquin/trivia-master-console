@@ -149,12 +149,14 @@ function runButton(id, customClass) {
 //#endregion
 
 //#region Main functionality
-function addRound() {
-    console.log("addRound not yet implemented");
-    if (roundsRef) {
-        var round = roundsRef.push({ name: "some round" });
+function addRound(e) {
+    e.preventDefault();
 
-        window.location.href = "create-round.html?id=" + round.key;
+    var roundName = $("#entity-name").val().trim();
+    if (roundsRef && roundName.length) {
+        roundsRef.push({ name: roundName });
+        $("#addModal").modal("hide");
+        // window.location.href = "create-round.html?id=" + round.key;
     }
 }
 
@@ -189,7 +191,7 @@ function deleteTeam() {
 //#endregion
 
 //#region Event Handlers
-$(document).on("click", ".add-round", addRound)
+$(document).on("click", ".modal .add-round", addRound)
     .on("click", ".edit-round", editRound)
     .on("click", ".delete-round", deleteRound)
     .on("click", ".run-round", runRound)

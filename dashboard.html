@@ -46,7 +46,7 @@
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
                             <span class="col-4 text-right round-commands">
-                                <button class="btn btn-default add-round">
+                                <button class="btn btn-default add-round" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
                             </span>
@@ -136,7 +136,8 @@
                 <form class="needs-validation" novalidate>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="entity-name" class="col-form-label"><span class="add-type text-capitalize"></span> name:</label>
+                            <label for="entity-name" class="col-form-label">
+                                <span class="add-type text-capitalize"></span> name:</label>
                             <input type="text" class="form-control" id="entity-name" required>
                         </div>
                     </div>
