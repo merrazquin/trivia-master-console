@@ -1,3 +1,22 @@
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyC4uRR38L_nrqTz0CR636MT3tsq7J4E8XA",
+    authDomain: "trivia-master-console.firebaseapp.com",
+    databaseURL: "https://trivia-master-console.firebaseio.com",
+    projectId: "trivia-master-console",
+    storageBucket: "trivia-master-console.appspot.com",
+    messagingSenderId: "1019033614397"
+};
+firebase.initializeApp(config);
+
+var database = firebase.database();
+var authID = "7VOGfEtN8HTKKi08bUeWvagPUQ13"; //hard-coded auth ID for testing
+
+function handleDatabaseError(error) {
+    console.log("Database error", error.code);
+
+}
+
 var uid;
 var initApp = function () {
     firebase.auth().onAuthStateChanged(function (user) {
@@ -22,7 +41,9 @@ var initApp = function () {
 };
 
 $(function () {
-    initApp()
+    if (location.href.indexOf("index.html") == -1) {
+        initApp()
+    }
 });
 
 $("#logout").click(() => {
@@ -41,4 +62,188 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
+//#endregion
+
+//#region DB Functions
+var userRef;
+var teamRef;
+var roundsRef;
+var onAuth = function (user) {
+    userRef = database.ref("/users/" + uid);
+    teamRef = database.ref("/users/" + uid + "/teams");
+    roundsRef = database.ref("/users/" + uid + "/rounds");
+
+    teamRef.on("child_added", function (childSnap) {
+        var child = childSnap.val();
+
+        $("<tr>")
+            .attr("id", childSnap.key)
+            .addClass("team")
+            .append(
+                $("<th>").attr("scope", "row").text(child.name),
+                $("<td>").text(child.score),
+                $("<td>").append(editButton(childSnap.key, "edit-team")),
+                $("<td>").append(deleteButton(childSnap.key))
+            ).appendTo($("#team-list"));
+    }, handleDatabaseError);
+
+    teamRef.on("child_removed", function (childSnap) {
+        $("#" + childSnap.key).remove();
+    }, handleDatabaseError);
+
+
+    roundsRef.on("child_added", function (childSnap) {
+        var child = childSnap.val();
+        $("<tr>")
+            .attr("id", childSnap.key)
+            .addClass("round")
+            .append(
+                $("<th>").attr("scope", "row").text(child.name),
+                $("<td>").append(editButton(childSnap.key, "edit-round")),
+                $("<td>").append(deleteButton(childSnap.key)),
+                $("<td>").append(runButton(childSnap.key, "run-round"))
+
+            ).appendTo($("#rounds-list"));
+
+    }, handleDatabaseError);
+
+    roundsRef.on("child_removed", function (childSnap) {
+        $("#" + childSnap.key).remove();
+    }, handleDatabaseError);
+}
+//#endregion
+
+//#region UI Builders
+function editButton(id, customClass) {
+    var className = "btn btn-default";
+    if (customClass) className += " " + customClass;
+    return $("<button>")
+        .attr("data-id", id)
+        .addClass(className)
+        .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>')
+        ;
+}
+
+function deleteButton(id, customClass) {
+    var className = "btn btn-default";
+    if (customClass) className += " " + customClass;
+    return $("<button>")
+        .attr("data-toggle", "modal")
+        .attr("data-target", "#deleteModal")
+        .attr("data-id", id)
+        .addClass(className)
+        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>')
+        ;
+}
+
+function runButton(id, customClass) {
+    var className = "btn btn-default";
+    if (customClass) className += " " + customClass;
+    return $("<button>")
+        .attr("data-id", id)
+        .addClass(className)
+        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>')
+        ;
+
+}
+//#endregion
+
+//#region Main functionality
+function addRound(e) {
+    e.preventDefault();
+
+    var roundName = $("#entity-name").val().trim();
+    if (roundsRef && roundName.length) {
+        roundsRef.push({ name: roundName });
+        $("#addModal").modal("hide");
+        // window.location.href = "create-round.html?id=" + round.key;
+    }
+}
+
+function editRound() {
+    console.log("editRound not yet implemented");
+}
+
+function deleteRound() {
+    database.ref("/users/" + uid + "/rounds/" + $(this).attr("data-id")).remove();
+}
+
+function runRound() {
+    window.location.href = "run-round.html?id=" + $(this).attr("data-id");
+}
+
+function addTeam(e) {
+    e.preventDefault();
+    var teamName = $("#entity-name").val().trim();
+    if (teamRef && teamName.length) {
+        teamRef.push({ name: teamName, score: 0 });
+        $("#addModal").modal("hide");
+    }
+}
+
+function editTeam() {
+    console.log("editTeam not yet implemented");
+}
+
+function deleteTeam() {
+    database.ref("/users/" + uid + "/teams/" + $(this).attr("data-id")).remove();
+}
+//#endregion
+
+//#region Event Handlers
+$(document).on("click", ".modal .add-round", addRound)
+    .on("click", ".edit-round", editRound)
+    .on("click", ".delete-round", deleteRound)
+    .on("click", ".run-round", runRound)
+    .on("click", ".modal .add-team", addTeam)
+    .on("click", ".edit-team", editTeam)
+    .on("click", ".delete-team", deleteTeam)
+    ;
+
+$("#deleteModal").on("show.bs.modal", function (event) {
+    var id = $(event.relatedTarget).attr("data-id");
+    var row = $("#" + id);
+
+    var modal = $(this);
+
+    // reset the confirm button
+    modal.find(".btn-primary").removeClass("delete-team").removeClass("delete-round");
+
+    // display the type & name of deletion
+    modal.find("#delete-type").text(row.hasClass("team") ? "team" : "round");
+    modal.find("#delete-name").text(row.find("th").text());
+
+    // set the correct data attribute and class to target deletion
+    modal.find(".btn-primary").attr("data-id", id).addClass(row.hasClass("team") ? "delete-team" : "delete-round");
+});
+
+// give focus to the delete button once modal loads
+$("#deleteModal").on("shown.bs.modal", function (event) {
+    $(this).find(".btn-primary").trigger("focus");
+});
+
+$("#addModal").on("show.bs.modal", function (event) {
+    var type = $(event.relatedTarget).hasClass("add-team") ? "team" : "round";
+
+
+    var modal = $(this);
+
+    // reset the add button
+    modal.find(".btn-primary").removeClass("add-team").removeClass("add-round");
+
+    // display the type of entity being added
+    modal.find(".add-type").text(type);
+
+    // set the correct class to target addition
+    modal.find(".btn-primary").addClass("add-" + type);
+});
+// give focus to the input field
+$("#addModal").on("shown.bs.modal", function (event) {
+    $(this).find("#entity-name").trigger("focus");
+});
+$("#addModal").on("hidden.bs.modal", function(event){
+    $("#entity-name").val("");
+});
+
+
 //#endregion

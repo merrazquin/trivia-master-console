@@ -4,103 +4,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Trivia Master Console - Dashboard</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css" />
-
-    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
-    <script src="scripts/firebase-init.js"></script>
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            </ul>
+            <span class="navbar-text">
+                Logged in as
+                <span id="user-info"></span>&nbsp;
+            </span>
+            <a class="btn btn-info btn-sm" href="#" role="button" id="logout">Log out</a>
+        </div>
+    </nav>
+
+
+
     <div class="jumbotron text-center">
         <h1>Trivia Master Console - Dashboard</h1>
-        <p>Logged in as
-            <span id="user-info"></span>
-        </p>
-        <p class="lead">
-            <a class="btn btn-primary btn-lg" href="#" role="button" id="logout">Log out</a>
-        </p>
     </div>
 
     <div class="container">
         <div class="row">
             <!-- Rounds -->
-            <div class="col-7">
-                <div class="card">
+            <div class="col-lg-8">
+                <div class="card text-white bg-info">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
                             <span class="col-4 text-right round-commands">
-                                <button class="btn btn-default add-round">
+                                <button class="btn btn-default add-round" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
                             </span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table rounds-list">
+                    <div class="card-body table-responsive">
+                        <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Round Name</th>
-                                    <th>Edit</th>
-                                    <th>Delete</th>
-                                    <th>Run</th>
+                                    <th scope="col">Round Name</th>
+                                    <th scope="col">Edit</th>
+                                    <th scope="col">Delete</th>
+                                    <th scope="col">Run</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <th>Dummy Round</th>
-                                    <td>
-                                        <button class="btn btn-default edit-round">
-                                            <span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-default delete-round">
-                                            <span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-default run-round">
-                                            <span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>
-                                        </button>
-                                    </td>
-                                </tr>
+                            <tbody id="rounds-list">
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <!-- Teams -->
-            <div class="col-5">
-                <div class="card">
+            <div class="col-lg-4">
+                <!-- Teams -->
+                <div class="card text-white bg-info">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Teams</h3>
                             <span class="col-4 text-right team-commands">
-                                <button class="btn btn-default add-team">
+                                <button class="btn btn-default add-team" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
                             </span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table">
+                    <div class="card-body table-responsive">
+                        <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Team Name</th>
-                                    <th>Score</th>
-                                    <th>Edit</th>
-                                    <th>Delete</th>
+                                    <th scope="col">Team Name</th>
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Edit</th>
+                                    <th scope="col">Delete</th>
                                 </tr>
                             </thead>
                             <tbody id="team-list">
@@ -111,19 +99,20 @@
             </div>
         </div>
     </div>
-
-    <!-- MODALS -->
+    <!-- #region MODALS -->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                    <h5 class="modal-title">Confirm Deletion</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete <span id="delete-type"></span> '<span id="delete-name"></span>'?
+                    Are you sure you want to delete
+                    <span id="delete-type"></span> '
+                    <span id="delete-name"></span>'?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -133,8 +122,45 @@
         </div>
     </div>
 
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add
+                        <span class="add-type text-capitalize"></span>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="needs-validation" novalidate>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="entity-name" class="col-form-label">
+                                <span class="add-type text-capitalize"></span> name:</label>
+                            <input type="text" class="form-control" id="entity-name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- #endregion -->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
     <script src="scripts/main.js"></script>
-    <script src="scripts/dashboard.js"></script>
 </body>
 
 </html>
