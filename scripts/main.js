@@ -80,7 +80,7 @@ var onAuth = function (user) {
             .attr("id", childSnap.key)
             .addClass("team")
             .append(
-                $("<th>").text(child.name),
+                $("<th>").attr("scope", "row").text(child.name),
                 $("<td>").text(child.score),
                 $("<td>").append(editButton(childSnap.key, "edit-team")),
                 $("<td>").append(deleteButton(childSnap.key))
@@ -98,7 +98,7 @@ var onAuth = function (user) {
             .attr("id", childSnap.key)
             .addClass("round")
             .append(
-                $("<th>").text(child.name),
+                $("<th>").attr("scope", "row").text(child.name),
                 $("<td>").append(editButton(childSnap.key, "edit-round")),
                 $("<td>").append(deleteButton(childSnap.key)),
                 $("<td>").append(runButton(childSnap.key, "run-round"))
@@ -167,15 +167,15 @@ function deleteRound() {
 }
 
 function runRound() {
-    console.log("runRound not yet implemented");
     window.location.href = "run-round.html?id=" + $(this).attr("data-id");
 }
 
-function addTeam() {
-    console.log("addTeam not yet fully implemented");
-    console.log("adding team");
-    if (teamRef) {
-        teamRef.push({ name: "some team", score: Math.floor(Math.random() * 100) });
+function addTeam(e) {
+    e.preventDefault();
+    var teamName = $("#entity-name").val().trim();
+    if (teamRef && teamName.length) {
+        teamRef.push({ name: teamName, score: 0 });
+        $("#addModal").modal("hide");
     }
 }
 
@@ -193,30 +193,55 @@ $(document).on("click", ".add-round", addRound)
     .on("click", ".edit-round", editRound)
     .on("click", ".delete-round", deleteRound)
     .on("click", ".run-round", runRound)
-    .on("click", ".add-team", addTeam)
+    .on("click", ".modal .add-team", addTeam)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
     ;
 
-$('#deleteModal').on('show.bs.modal', function (event) {
+$("#deleteModal").on("show.bs.modal", function (event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
 
     var modal = $(this);
 
     // reset the confirm button
-    modal.find('.btn-primary').removeClass("delete-team").removeClass("delete-round");
+    modal.find(".btn-primary").removeClass("delete-team").removeClass("delete-round");
 
     // display the type & name of deletion
-    modal.find('#delete-type').text(row.hasClass("team") ? "team" : "round");
-    modal.find('#delete-name').text(row.find("th").text());
+    modal.find("#delete-type").text(row.hasClass("team") ? "team" : "round");
+    modal.find("#delete-name").text(row.find("th").text());
 
     // set the correct data attribute and class to target deletion
-    modal.find('.btn-primary').attr("data-id", id).addClass(row.hasClass("team") ? "delete-team" : "delete-round");
-})
+    modal.find(".btn-primary").attr("data-id", id).addClass(row.hasClass("team") ? "delete-team" : "delete-round");
+});
 
 // give focus to the delete button once modal loads
-$('#deleteModal').on('shown.bs.modal', function (event) {
-    $(this).find('.btn-primary').trigger('focus');
-})
+$("#deleteModal").on("shown.bs.modal", function (event) {
+    $(this).find(".btn-primary").trigger("focus");
+});
+
+$("#addModal").on("show.bs.modal", function (event) {
+    var type = $(event.relatedTarget).hasClass("add-team") ? "team" : "round";
+
+
+    var modal = $(this);
+
+    // reset the add button
+    modal.find(".btn-primary").removeClass("add-team").removeClass("add-round");
+
+    // display the type of entity being added
+    modal.find(".add-type").text(type);
+
+    // set the correct class to target addition
+    modal.find(".btn-primary").addClass("add-" + type);
+});
+// give focus to the input field
+$("#addModal").on("shown.bs.modal", function (event) {
+    $(this).find("#entity-name").trigger("focus");
+});
+$("#addModal").on("hidden.bs.modal", function(event){
+    $("#entity-name").val("");
+});
+
+
 //#endregion
