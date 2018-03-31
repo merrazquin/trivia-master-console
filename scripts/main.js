@@ -116,8 +116,6 @@ var onAuth = function (user) {
     }, handleDatabaseError);
 
     roundsRef.on("value", function (roundsSnap) {
-        var currentRoundID = $(".add-question").attr("data-id");
-
         rounds = roundsSnap.val();
         updateQuestionsList();
 
@@ -179,9 +177,9 @@ function addRound(e) {
 
     var roundName = $("#entity-name").val().trim();
     if (roundsRef && roundName.length) {
-        roundsRef.push({ name: roundName });
+        var round = roundsRef.push({ name: roundName, pointsPerQuestion: 1 });
         $("#addModal").modal("hide");
-        // window.location.href = "create-round.html?id=" + round.key;
+        editRound(null, round.key);
     }
 }
 
@@ -193,9 +191,8 @@ function editRoundName(e) {
     }
 }
 
-function editRound() {
-    console.log("editRound not yet fully implemented");
-    var roundID = $(this).attr("data-id");
+function editRound(e, id) {
+    var roundID = id || $(this).attr("data-id");
     var round = rounds[roundID];
     if (!round) {
         return;
@@ -305,13 +302,14 @@ function deleteTeam() {
 function addQuestion(e) {
     var roundID = $(this).attr("data-id");
     var round = rounds[roundID];
-    roundsRef.child("/" + roundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: (Object.keys(round.questions).length + 1) });
+    var order = round.questions ? (Object.keys(round.questions).length + 1) : 1;
+    roundsRef.child("/" + roundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: order });
 }
 
 function editQuestionTitle(e) {
     var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
-    
+
     if (e.value !== e.old_value) {
         roundsRef.child("/" + roundID + "/questions/" + questionID + "/question").set(e.value);
     }
@@ -321,9 +319,14 @@ function editQuestionAnswer(e) {
     var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
 
-    if(e.value !== e.old_value) {
+    if (e.value !== e.old_value) {
         roundsRef.child("/" + roundID + "/questions/" + questionID + "/answer").set(e.value);
     }
+}
+
+function updatePointsPerQuestion(e) {
+    var roundID = $(".add-question").attr("data-id");
+    roundsRef.child("/" + roundID + "/pointsPerQuestion").set($(this).val());
 }
 
 function deleteQuestion() {
@@ -346,6 +349,7 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".cancel-team-edit", cancelEditTeam)
     .on("click", ".add-question", addQuestion)
     .on("click", ".delete-question", deleteQuestion)
+    .on("input", "#ppq", updatePointsPerQuestion)
     ;
 
 $("#questions-list").sortable({
