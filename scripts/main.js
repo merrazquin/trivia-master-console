@@ -14,7 +14,6 @@ var authID = "7VOGfEtN8HTKKi08bUeWvagPUQ13"; //hard-coded auth ID for testing
 
 function handleDatabaseError(error) {
     console.log("Database error", error.code);
-
 }
 
 var uid;
@@ -42,7 +41,7 @@ var initApp = function () {
 
 $(function () {
     if (location.href.indexOf("index.html") == -1) {
-        initApp()
+        initApp();
     }
 });
 
@@ -194,10 +193,29 @@ function editTeamname(e) {
         database.ref("/users/" + uid + "/teams/" + teamID +"/name").set(e.value);
     }
 }
-
+// Joellen works here
 function editTeam() {
+    /*$("#rounds-card").hide();
+    $("#teams-card").removeClass("col-lg-4").addClass("col-lg-12");
+    $("#teams-card .default-view").hide();
+    $("#teams-card .edit-view").show();*/
+    var roundScore = 0;
+    var scoreSum = 0;
+    // after the roundScore has been input by the user, we will want to push that value into scoreSum
+        // grab the input from the form so we know what roundScore is
+        // push to scoreSum which is what displays on the form
+    // scoreSum will hold that tallying score, roundScore will provide the number to add to the exisiting number of scoreSum
+    
     console.log("editTeam not yet implemented");
 }
+
+function cancelEditTeam() {
+    $("#rounds-card").show();
+    $("#teams-card").removeClass("col-lg-12").addClass("col-lg-4");
+    $("#teams-card .default-view").show();
+    $("#teams-card .edit-view").hide();
+}
+// Joellen stops working here
 
 function deleteTeam() {
     database.ref("/users/" + uid + "/teams/" + $(this).attr("data-id")).remove();

@@ -40,8 +40,8 @@
     <div class="container">
         <div class="row">
             <!-- Rounds -->
-            <div class="col-lg-8">
-                <div class="card text-white bg-info">
+            <div id="rounds-card" class="col-lg-8">
+                <div class="card text-white bg-info default-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
@@ -67,10 +67,25 @@
                         </table>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <!-- Teams -->
-                <div class="card text-white bg-info">
+                <div class="card text-white bg-info edit-view">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Edit Round</h3>
+                            <span class="col-4 text-right round-commands">
+                                <button class="btn btn-default cancel-round-edit" data-type="round">
+                                    <span class="octicon octicon-x"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                        </form>
+                    </div>
+                </div>
+            <!-- Teams -->
+            <div id="teams-card" class="col-lg-4">
+                <div class="card text-white bg-info default-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Teams</h3>
@@ -94,6 +109,14 @@
                             <tbody id="team-list">
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="card text-white bg-info edit-view">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Edit Team</h3>
+                        
+                        </div>
                     </div>
                 </div>
             </div>
