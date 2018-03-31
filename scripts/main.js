@@ -10,16 +10,17 @@ var config = {
 firebase.initializeApp(config);
 
 var database = firebase.database();
-var authID = "7VOGfEtN8HTKKi08bUeWvagPUQ13"; //hard-coded auth ID for testing
 
 function handleDatabaseError(error) {
     console.log("Database error", error.code);
-
 }
 
-var uid;
-var initApp = function() {
-    firebase.auth().onAuthStateChanged(function(user) {
+
+var uid,
+    rounds;
+
+var initApp = function () {
+    firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             // User is signed in.
             uid = user.uid;
@@ -67,50 +68,56 @@ function getUrlParameter(name) {
 var userRef;
 var teamRef;
 var roundsRef;
-var onAuth = function(user) {
-        userRef = database.ref("/users/" + uid);
-        teamRef = database.ref("/users/" + uid + "/teams");
-        roundsRef = database.ref("/users/" + uid + "/rounds");
 
-        teamRef.on("child_added", function(childSnap) {
-            var child = childSnap.val();
+var onAuth = function (user) {
+    userRef = database.ref("/users/" + uid);
+    teamRef = database.ref("/users/" + uid + "/teams");
+    roundsRef = database.ref("/users/" + uid + "/rounds");
 
-            $("<tr>")
-                .attr("id", childSnap.key)
-                .attr("data-type", "team")
-                .append(
-                    $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamname),
-                    $("<td>").text(child.score),
-                    $("<td>").append(editButton(childSnap.key, "edit-team")),
-                    $("<td>").append(deleteButton(childSnap.key))
-                ).appendTo($("#team-list"));
-        }, handleDatabaseError);
+    teamRef.on("child_added", function (childSnap) {
+        var child = childSnap.val();
 
-        teamRef.on("child_removed", function(childSnap) {
-            $("#" + childSnap.key).remove();
-        }, handleDatabaseError);
+        $("<tr>")
+            .attr("id", childSnap.key)
+            .attr("data-type", "team")
+            .append(
+                $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamname),
+                $("<td>").text(child.score),
+                $("<td>").append(editButton(childSnap.key, "edit-team")),
+                $("<td>").append(deleteButton(childSnap.key))
+            ).appendTo($("#team-list"));
+    }, handleDatabaseError);
+
+    teamRef.on("child_removed", function (childSnap) {
+        $("#" + childSnap.key).remove();
+    }, handleDatabaseError);
 
 
-        roundsRef.on("child_added", function(childSnap) {
-            var child = childSnap.val();
-            $("<tr>")
-                .attr("id", childSnap.key)
-                .attr("data-type", "round")
-                .append(
-                    $("<th>").attr("scope", "row").text(child.name).editable("click", editRoundName),
-                    $("<td>").append(editButton(childSnap.key, "edit-round")),
-                    $("<td>").append(deleteButton(childSnap.key)),
-                    $("<td>").append(runButton(childSnap.key, "run-round"))
+    roundsRef.on("child_added", function (childSnap) {
+        var child = childSnap.val();
+        $("<tr>")
+            .attr("id", childSnap.key)
+            .attr("data-type", "round")
+            .append(
+                $("<th>").attr("scope", "row").text(child.name).editable("click", editRoundName),
+                $("<td>").append(editButton(childSnap.key, "edit-round")),
+                $("<td>").append(deleteButton(childSnap.key)),
+                $("<td>").append(runButton(childSnap.key, "run-round"))
 
-                ).appendTo($("#rounds-list"));
+            ).appendTo($("#rounds-list"));
 
-        }, handleDatabaseError);
+    }, handleDatabaseError);
 
-        roundsRef.on("child_removed", function(childSnap) {
-            $("#" + childSnap.key).remove();
-        }, handleDatabaseError);
-    }
-    //#endregion
+    roundsRef.on("value", function(roundsSnap) {
+        rounds = roundsSnap.val();
+
+    }, handleDatabaseError)
+
+    roundsRef.on("child_removed", function (childSnap) {
+        $("#" + childSnap.key).remove();
+    }, handleDatabaseError);
+}
+//#endregion
 
 //#region UI Builders
 function editButton(id, customClass) {
@@ -157,11 +164,40 @@ function addRound(e) {
 }
 
 function editRoundName(e) {
-    console.log(e.value, "vs", e.old_value);
+    var roundID = e.target.parents("tr").attr("id");
+
+    if (e.value !== e.old_value) {
+        database.ref("/users/" + uid + "/rounds/" + roundID + "/name").set(e.value);
+    }
 }
 
 function editRound() {
-    console.log("editRound not yet implemented");
+    console.log("editRound not yet fully implemented");
+    var roundID = $(this).attr("data-id");
+    var round = rounds[roundID];
+
+    $("#roundName").val(round.name);
+    if(round.questions[0] == "") {
+        round.questions.unshift();
+    }
+    console.log(round.questions);
+    console.log(round.questions[0]);
+    console.log(round.questions[1]);
+    
+
+    $("#teams-card").hide();
+    $("#rounds-card").removeClass("col-lg-8").addClass("col-lg-12");
+    $("#rounds-card .default-view").hide();
+    $("#rounds-card .edit-view").show();
+}
+
+function cancelRoundEdit() {
+    console.log("cancel round edit");
+
+    $("#teams-card").show();
+    $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
+    $("#rounds-card .default-view").show();
+    $("#rounds-card .edit-view").hide();
 }
 
 function deleteRound() {
@@ -183,17 +219,34 @@ function addTeam(e) {
 
 function editTeamname(e) {
     var teamID = e.target.parents("tr").attr("id");
-    console.log(teamID);
-    console.log(e.value, "vs", e.old_value);
 
     if (e.value !== e.old_value) {
         database.ref("/users/" + uid + "/teams/" + teamID + "/name").set(e.value);
     }
 }
-
+// Joellen works here
 function editTeam() {
+    $("#rounds-card").hide();
+    $("#teams-card").removeClass("col-lg-4").addClass("col-lg-12");
+    $("#teams-card .default-view").hide();
+    $("#teams-card .edit-view").show();
+    var roundScore = 0;
+    var scoreSum = 0;
+    // after the roundScore has been input by the user, we will want to push that value into scoreSum
+        // grab the input from the form so we know what roundScore is
+        // push to scoreSum which is what displays on the form
+    // scoreSum will hold that tallying score, roundScore will provide the number to add to the exisiting number of scoreSum
+    
     console.log("editTeam not yet implemented");
 }
+
+function cancelEditTeam() {
+    $("#rounds-card").show();
+    $("#teams-card").removeClass("col-lg-12").addClass("col-lg-4");
+    $("#teams-card .default-view").show();
+    $("#teams-card .edit-view").hide();
+}
+// Joellen stops working here
 
 function deleteTeam() {
     database.ref("/users/" + uid + "/teams/" + $(this).attr("data-id")).remove();
@@ -207,7 +260,10 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".run-round", runRound)
     .on("click", ".modal .add-team", addTeam)
     .on("click", ".edit-team", editTeam)
-    .on("click", ".delete-team", deleteTeam);
+    .on("click", ".delete-team", deleteTeam)
+    .on("click", ".cancel-round-edit", cancelRoundEdit)
+    .on("click", ".cancel-team-edit", cancelEditTeam)
+    ;
 
 $("#deleteModal").on("show.bs.modal", function(event) {
     var id = $(event.relatedTarget).attr("data-id");
