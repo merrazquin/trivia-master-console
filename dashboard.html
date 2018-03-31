@@ -79,29 +79,40 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="roundName">Round Name</label>
-                                <input type="text" class="form-control" id="roundName">
+                        <div class="row">
+                            <div class="col-10">
+                                <div class="form-group">
+                                    <label for="roundName">Round Name</label>
+                                    <input type="text" class="form-control" id="roundName">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="pointsPerQuestion">Points per question</label>
-                                <input type="number" class="form-control" id="ppq">
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="pointsPerQuestion">Points per question</label>
+                                    <input type="number" class="form-control" id="ppq">
+                                </div>
                             </div>
-                            <table class="table">
-                                <thead>
-                                    <th scope="col">Question</th>
-                                    <th scope="col">Answer</th>
-                                    <th scope="col">Delete</th>
-                                </thead>
-                                <tbody>
+                        </div>
+                        <p>
+                            <button class="btn btn-default add-question">Add Question</button>
+                        </p>
+                        <table class="table">
+                            <thead>
+                                <th scope="col">Order</th>
+                                <th scope="col">Question</th>
+                                <th scope="col">Answer</th>
+                                <th scope="col">Delete</th>
+                            </thead>
+                            <tbody id="questions-list" class="ui-sortable">
 
-                                </tbody>
-                            </table>
-                            <div class="form-group">
-                                
-                            </div>
-                        </form>
+                            </tbody>
+                        </table>
+                        <p>
+                            <button class="btn btn-default add-question">Add Question</button>
+                        </p>
+                        <div class="form-group">
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,6 +166,7 @@
                                         <th scope="col">Delete</th>
                                     </tr>
                                 </thead>
+                                <!-- JOELLEN: can't have 2 elements with same id (team-list) -->
                                 <tbody id="team-list">
                                 </tbody>
                             </table>
@@ -217,6 +229,8 @@
     <!-- #endregion -->
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
         crossorigin="anonymous"></script>
     <script src="scripts/jquery.editable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>

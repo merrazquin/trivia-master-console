@@ -35,22 +35,21 @@ var initApp = function () {
             // User is signed out, redirect to login page
             window.location.replace("index.html");
         }
-    }, function(error) {
+    }, function (error) {
         console.log(error);
     });
 };
 
-$(function() {
+$(function () {
     if (location.href.indexOf("index.html") == -1) {
         initApp();
     }
 });
 
 $("#logout").click(() => {
-    firebase.auth().signOut().then(function() {
-        console.log('Signed Out');
+    firebase.auth().signOut().then(function () {
         window.location.replace("index.html");
-    }, function(error) {
+    }, function (error) {
         console.error('Sign Out Error', error);
     });
 });
@@ -62,6 +61,14 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
+
+function sortByOrder(a, b) {
+    if (!a.order || !b.order) {
+        return 0;
+    }
+    return a.order - b.order;
+}
+
 //#endregion
 
 //#region DB Functions
@@ -108,14 +115,29 @@ var onAuth = function (user) {
 
     }, handleDatabaseError);
 
-    roundsRef.on("value", function(roundsSnap) {
-        rounds = roundsSnap.val();
+    roundsRef.on("value", function (roundsSnap) {
+        var currentRoundID = $(".add-question").attr("data-id");
 
-    }, handleDatabaseError)
+        rounds = roundsSnap.val();
+        updateQuestionsList();
+
+    }, handleDatabaseError);
 
     roundsRef.on("child_removed", function (childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
+}
+
+
+function reorderQuestions(event, ui) {
+    var roundID = $(".add-question").attr("data-id");
+
+    $.each($("#questions-list tr"), function (index, row) {
+        var questionID = $(row).attr("id");
+        var pos = index + 1;
+
+        roundsRef.child("/" + roundID + "/questions/" + questionID + "/order").set(pos);
+    });
 }
 //#endregion
 
@@ -167,7 +189,7 @@ function editRoundName(e) {
     var roundID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        database.ref("/users/" + uid + "/rounds/" + roundID + "/name").set(e.value);
+        roundsRef.child("/" + roundID + "/name").set(e.value);
     }
 }
 
@@ -175,15 +197,15 @@ function editRound() {
     console.log("editRound not yet fully implemented");
     var roundID = $(this).attr("data-id");
     var round = rounds[roundID];
+    if (!round) {
+        return;
+    }
+    $(".add-question").attr("data-id", roundID);
+
+    updateQuestionsList();
 
     $("#roundName").val(round.name);
-    if(round.questions[0] == "") {
-        round.questions.unshift();
-    }
-    console.log(round.questions);
-    console.log(round.questions[0]);
-    console.log(round.questions[1]);
-    
+    $("#ppq").val(round.pointsPerQuestion);
 
     $("#teams-card").hide();
     $("#rounds-card").removeClass("col-lg-8").addClass("col-lg-12");
@@ -191,17 +213,45 @@ function editRound() {
     $("#rounds-card .edit-view").show();
 }
 
-function cancelRoundEdit() {
-    console.log("cancel round edit");
+function updateQuestionsList() {
+    var roundID = $(".add-question").attr("data-id");
 
+    if (roundID) {
+        var round = rounds[roundID];
+        if (round) {
+            var questions = [];
+            for (var key in round.questions) {
+                var question = round.questions[key];
+                question.id = key;
+                questions.push(question);
+            }
+            questions.sort(sortByOrder);
+
+            $("#questions-list").empty();
+
+            var pos = 0;
+            questions.forEach(question => {
+                $("<tr>").attr("id", question.id).attr("data-type", "question").append(
+                    $("<td>").addClass("ui-sortable-handle").append('<span class="octicon octicon-grabber" aria-hidden="true" aria-label="Reorder"></span> ').append(++pos),
+                    $("<th>").attr("scope", "row").editable("click", editQuestionTitle).text(question.question),
+                    $("<td>").text(question.answer),
+                    $("<td>").append(deleteButton(question.id))
+                ).appendTo($("#questions-list"));
+            });
+        }
+    }
+}
+
+function cancelRoundEdit() {
     $("#teams-card").show();
     $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
     $("#rounds-card .default-view").show();
     $("#rounds-card .edit-view").hide();
+    $(".add-question").attr("data-id", "");
 }
 
 function deleteRound() {
-    database.ref("/users/" + uid + "/rounds/" + $(this).attr("data-id")).remove();
+    roundsRef.child("/" + $(this).attr("data-id")).remove();
 }
 
 function runRound() {
@@ -221,7 +271,7 @@ function editTeamname(e) {
     var teamID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        database.ref("/users/" + uid + "/teams/" + teamID + "/name").set(e.value);
+        teamRef.child("/" + teamID + "/name").set(e.value);
     }
 }
 // Joellen works here
@@ -233,10 +283,10 @@ function editTeam() {
     var roundScore = 0;
     var scoreSum = 0;
     // after the roundScore has been input by the user, we will want to push that value into scoreSum
-        // grab the input from the form so we know what roundScore is
-        // push to scoreSum which is what displays on the form
+    // grab the input from the form so we know what roundScore is
+    // push to scoreSum which is what displays on the form
     // scoreSum will hold that tallying score, roundScore will provide the number to add to the exisiting number of scoreSum
-    
+
     console.log("editTeam not yet implemented");
 }
 
@@ -249,7 +299,29 @@ function cancelEditTeam() {
 // Joellen stops working here
 
 function deleteTeam() {
-    database.ref("/users/" + uid + "/teams/" + $(this).attr("data-id")).remove();
+    teamRef.child("/" + $(this).attr("data-id")).remove();
+}
+
+function addQuestion(e) {
+    var roundID = $(this).attr("data-id");
+    var round = rounds[roundID];
+    roundsRef.child("/" + roundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: (Object.keys(round.questions).length + 1) });
+}
+
+function editQuestionTitle(e) {
+    var roundID = $(".add-question").attr("data-id");
+    var questionID = e.target.parents("tr").attr("id");
+    
+    if (e.value !== e.old_value) {
+        roundsRef.child("/" + roundID + "/questions/" + questionID + "/question").set(e.value);
+    }
+}
+
+function deleteQuestion() {
+    var roundID = $(".add-question").attr("data-id");
+    var questionID = $(this).attr("data-id");
+
+    roundsRef.child("/" + roundID + "/questions/" + questionID).remove();
 }
 //#endregion
 
@@ -263,9 +335,18 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".delete-team", deleteTeam)
     .on("click", ".cancel-round-edit", cancelRoundEdit)
     .on("click", ".cancel-team-edit", cancelEditTeam)
+    .on("click", ".add-question", addQuestion)
+    .on("click", ".delete-question", deleteQuestion)
     ;
 
-$("#deleteModal").on("show.bs.modal", function(event) {
+$("#questions-list").sortable({
+    placeholder: "ui-state-highlight",
+    forceHelperSize: true,
+    handle: ".ui-sortable-handle",
+    update: reorderQuestions
+});
+
+$("#deleteModal").on("show.bs.modal", function (event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
     var type = row.attr("data-type");
@@ -273,7 +354,7 @@ $("#deleteModal").on("show.bs.modal", function(event) {
     var modal = $(this);
 
     // reset the confirm button
-    modal.find(".btn-primary").attr("css", "btn btn-primary");
+    modal.find(".btn-primary").attr("class", "btn btn-primary").attr("data-id", "");
 
     // display the type & name of deletion
     modal.find("#delete-type").text(type);
@@ -284,14 +365,12 @@ $("#deleteModal").on("show.bs.modal", function(event) {
 });
 
 // give focus to the delete button once modal loads
-$("#deleteModal").on("shown.bs.modal", function(event) {
+$("#deleteModal").on("shown.bs.modal", function (event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
-$("#addModal").on("show.bs.modal", function(event) {
+$("#addModal").on("show.bs.modal", function (event) {
     var type = $(event.relatedTarget).attr("data-type");
-
-
     var modal = $(this);
 
     // reset the add button
@@ -304,10 +383,10 @@ $("#addModal").on("show.bs.modal", function(event) {
     modal.find(".btn-primary").addClass("add-" + type);
 });
 // give focus to the input field
-$("#addModal").on("shown.bs.modal", function(event) {
+$("#addModal").on("shown.bs.modal", function (event) {
     $(this).find("#entity-name").trigger("focus");
 });
-$("#addModal").on("hidden.bs.modal", function(event) {
+$("#addModal").on("hidden.bs.modal", function (event) {
     $("#entity-name").val("");
 });
 
@@ -319,7 +398,7 @@ $("#addModal").on("hidden.bs.modal", function(event) {
 function pullQuestion(amount, category, callback) {
     var queryURL = "https://opentdb.com/api.php?amount=" + amount + "&category=" + category;
     //queryURL += "4562ade6f1ae691b9cd4a4e64c681673ef59b4be9b6bd5e194464c124656892b";
-    $.getJSON(queryURL, function(result) {
+    $.getJSON(queryURL, function (result) {
         if (callback) {
             callback(result);
         } else {
@@ -336,10 +415,10 @@ var queryURL = "https://opentdb.com/api_category.php";
 $.ajax({
     url: queryURL,
     method: 'GET'
-}).then(function(response) {
-    var categories ="";
-    for (i=0; i<response.trivia_categories.length; i++) {
-        categories=categories+"<option value=" + response.trivia_categories[i].name + "> " + response.trivia_categories[i].name + "</option>";
+}).then(function (response) {
+    var categories = "";
+    for (i = 0; i < response.trivia_categories.length; i++) {
+        categories = categories + "<option value=" + response.trivia_categories[i].name + "> " + response.trivia_categories[i].name + "</option>";
     }
     $("#categories").append(categories);
 
