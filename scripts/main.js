@@ -329,3 +329,19 @@ function pullQuestion(amount, category, callback) {
 }
 //I recommend the next step involve binding this function to inputs from the UI HTML, and binding the output to the appropriate area in the UI HTML
 //$("div").append(field + " ");
+
+//#region roundCreation
+var queryURL = "https://opentdb.com/api_category.php";
+
+$.ajax({
+    url: queryURL,
+    method: 'GET'
+}).then(function(response) {
+    var categories ="";
+    for (i=0; i<response.trivia_categories.length; i++) {
+        categories=categories+"<option value=" + response.trivia_categories[i].name + "> " + response.trivia_categories[i].name + "</option>";
+    }
+    $("#categories").append(categories);
+
+});
+//#endregion
