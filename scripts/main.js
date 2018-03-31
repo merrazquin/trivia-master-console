@@ -234,7 +234,7 @@ function updateQuestionsList() {
                 $("<tr>").attr("id", question.id).attr("data-type", "question").append(
                     $("<td>").addClass("ui-sortable-handle").append('<span class="octicon octicon-grabber" aria-hidden="true" aria-label="Reorder"></span> ').append(++pos),
                     $("<th>").attr("scope", "row").editable("click", editQuestionTitle).text(question.question),
-                    $("<td>").text(question.answer),
+                    $("<td>").editable("click", editQuestionAnswer).text(question.answer),
                     $("<td>").append(deleteButton(question.id))
                 ).appendTo($("#questions-list"));
             });
@@ -314,6 +314,15 @@ function editQuestionTitle(e) {
     
     if (e.value !== e.old_value) {
         roundsRef.child("/" + roundID + "/questions/" + questionID + "/question").set(e.value);
+    }
+}
+
+function editQuestionAnswer(e) {
+    var roundID = $(".add-question").attr("data-id");
+    var questionID = e.target.parents("tr").attr("id");
+
+    if(e.value !== e.old_value) {
+        roundsRef.child("/" + roundID + "/questions/" + questionID + "/answer").set(e.value);
     }
 }
 
