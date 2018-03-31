@@ -6077,4 +6077,7 @@ a.text-dark:hover, a.text-dark:focus {
 tbody th {
   cursor: pointer; }
 
+.edit-view {
+  display: none; }
+
 /*# sourceMappingURL=bootstrap.css.map */

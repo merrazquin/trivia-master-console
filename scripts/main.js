@@ -10,7 +10,6 @@ var config = {
 firebase.initializeApp(config);
 
 var database = firebase.database();
-var authID = "7VOGfEtN8HTKKi08bUeWvagPUQ13"; //hard-coded auth ID for testing
 
 function handleDatabaseError(error) {
     console.log("Database error", error.code);
@@ -42,7 +41,7 @@ var initApp = function () {
 
 $(function () {
     if (location.href.indexOf("index.html") == -1) {
-        initApp()
+        initApp();
     }
 });
 
@@ -161,11 +160,28 @@ function addRound(e) {
 }
 
 function editRoundName(e) {
-    console.log(e.value, "vs", e.old_value);
+    var roundID = e.target.parents("tr").attr("id");
+
+    if (e.value !== e.old_value) {
+        database.ref("/users/" + uid + "/rounds/" + roundID + "/name").set(e.value);
+    }
 }
 
 function editRound() {
     console.log("editRound not yet implemented");
+    $("#teams-card").hide();
+    $("#rounds-card").removeClass("col-lg-8").addClass("col-lg-12");
+    $("#rounds-card .default-view").hide();
+    $("#rounds-card .edit-view").show();
+}
+
+function cancelRoundEdit() {
+    console.log("cancel round edit");
+    
+    $("#teams-card").show();
+    $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
+    $("#rounds-card .default-view").show();
+    $("#rounds-card .edit-view").hide();
 }
 
 function deleteRound() {
@@ -187,11 +203,9 @@ function addTeam(e) {
 
 function editTeamname(e) {
     var teamID = e.target.parents("tr").attr("id");
-    console.log(teamID);
-    console.log(e.value, "vs", e.old_value);
 
-    if(e.value !== e.old_value) {
-        database.ref("/users/" + uid + "/teams/" + teamID +"/name").set(e.value);
+    if (e.value !== e.old_value) {
+        database.ref("/users/" + uid + "/teams/" + teamID + "/name").set(e.value);
     }
 }
 
@@ -212,6 +226,7 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".modal .add-team", addTeam)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
+    .on("click", ".cancel-round-edit", cancelRoundEdit)
     ;
 
 $("#deleteModal").on("show.bs.modal", function (event) {
