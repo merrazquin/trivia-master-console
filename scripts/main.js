@@ -15,6 +15,7 @@ function handleDatabaseError(error) {
     console.log("Database error", error.code);
 }
 
+
 var uid,
     rounds;
 
@@ -25,8 +26,7 @@ var initApp = function () {
             uid = user.uid;
             $("#user-info").text(user.displayName + " (" + user.email + ")");
 
-            try { onAuth(user); }
-            catch (e) {
+            try { onAuth(user); } catch (e) {
                 if (e.name != "ReferenceError") {
                     console.log("Error:", e);
                 }
@@ -35,22 +35,22 @@ var initApp = function () {
             // User is signed out, redirect to login page
             window.location.replace("index.html");
         }
-    }, function (error) {
+    }, function(error) {
         console.log(error);
     });
 };
 
-$(function () {
+$(function() {
     if (location.href.indexOf("index.html") == -1) {
         initApp();
     }
 });
 
 $("#logout").click(() => {
-    firebase.auth().signOut().then(function () {
+    firebase.auth().signOut().then(function() {
         console.log('Signed Out');
         window.location.replace("index.html");
-    }, function (error) {
+    }, function(error) {
         console.error('Sign Out Error', error);
     });
 });
@@ -68,6 +68,7 @@ function getUrlParameter(name) {
 var userRef;
 var teamRef;
 var roundsRef;
+
 var onAuth = function (user) {
     userRef = database.ref("/users/" + uid);
     teamRef = database.ref("/users/" + uid + "/teams");
@@ -125,8 +126,7 @@ function editButton(id, customClass) {
     return $("<button>")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>')
-        ;
+        .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>');
 }
 
 function deleteButton(id, customClass) {
@@ -137,8 +137,7 @@ function deleteButton(id, customClass) {
         .attr("data-target", "#deleteModal")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>')
-        ;
+        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>');
 }
 
 function runButton(id, customClass) {
@@ -147,8 +146,7 @@ function runButton(id, customClass) {
     return $("<button>")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>')
-        ;
+        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>');
 
 }
 //#endregion
@@ -267,7 +265,7 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".cancel-team-edit", cancelEditTeam)
     ;
 
-$("#deleteModal").on("show.bs.modal", function (event) {
+$("#deleteModal").on("show.bs.modal", function(event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
     var type = row.attr("data-type");
@@ -286,11 +284,11 @@ $("#deleteModal").on("show.bs.modal", function (event) {
 });
 
 // give focus to the delete button once modal loads
-$("#deleteModal").on("shown.bs.modal", function (event) {
+$("#deleteModal").on("shown.bs.modal", function(event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
-$("#addModal").on("show.bs.modal", function (event) {
+$("#addModal").on("show.bs.modal", function(event) {
     var type = $(event.relatedTarget).attr("data-type");
 
 
@@ -306,12 +304,28 @@ $("#addModal").on("show.bs.modal", function (event) {
     modal.find(".btn-primary").addClass("add-" + type);
 });
 // give focus to the input field
-$("#addModal").on("shown.bs.modal", function (event) {
+$("#addModal").on("shown.bs.modal", function(event) {
     $(this).find("#entity-name").trigger("focus");
 });
-$("#addModal").on("hidden.bs.modal", function (event) {
+$("#addModal").on("hidden.bs.modal", function(event) {
     $("#entity-name").val("");
 });
 
 
 //#endregion
+
+
+//search function allows user to select question number and type with greater specificity
+function pullQuestion(amount, category, callback) {
+    var queryURL = "https://opentdb.com/api.php?amount=" + amount + "&category=" + category;
+    //queryURL += "4562ade6f1ae691b9cd4a4e64c681673ef59b4be9b6bd5e194464c124656892b";
+    $.getJSON(queryURL, function(result) {
+        if (callback) {
+            callback(result);
+        } else {
+            console.log(result)
+        };
+    });
+}
+//I recommend the next step involve binding this function to inputs from the UI HTML, and binding the output to the appropriate area in the UI HTML
+//$("div").append(field + " ");
