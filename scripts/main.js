@@ -271,3 +271,4 @@ function pullQuestion(amount, category, callback) {
         };
     });
 }
+//I recommend the next step involve binding this function to inputs from the UI HTML, and binding the output to the appropriate area in the UI HTML
