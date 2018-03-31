@@ -228,10 +228,10 @@ function editTeamname(e) {
 }
 // Joellen works here
 function editTeam() {
-    /*$("#rounds-card").hide();
+    $("#rounds-card").hide();
     $("#teams-card").removeClass("col-lg-4").addClass("col-lg-12");
     $("#teams-card .default-view").hide();
-    $("#teams-card .edit-view").show();*/
+    $("#teams-card .edit-view").show();
     var roundScore = 0;
     var scoreSum = 0;
     // after the roundScore has been input by the user, we will want to push that value into scoreSum
@@ -264,6 +264,7 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
     .on("click", ".cancel-round-edit", cancelRoundEdit)
+    .on("click", ".cancel-team-edit", cancelEditTeam)
     ;
 
 $("#deleteModal").on("show.bs.modal", function (event) {
