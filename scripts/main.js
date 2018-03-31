@@ -258,6 +258,8 @@ $("#addModal").on("hidden.bs.modal", function(event) {
 
 //#endregion
 
+
+//search function allows user to select question number and type with greater specificity
 function pullQuestion(amount, category, callback) {
     var queryURL = "https://opentdb.com/api.php?amount=" + amount + "&category=" + category;
     //queryURL += "4562ade6f1ae691b9cd4a4e64c681673ef59b4be9b6bd5e194464c124656892b";
