@@ -16,7 +16,9 @@ function handleDatabaseError(error) {
 
 }
 
-var uid;
+var uid,
+    rounds;
+
 var initApp = function () {
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
@@ -106,6 +108,11 @@ var onAuth = function (user) {
 
     }, handleDatabaseError);
 
+    roundsRef.on("value", function(roundsSnap) {
+        rounds = roundsSnap.val();
+
+    }, handleDatabaseError)
+
     roundsRef.on("child_removed", function (childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
@@ -168,7 +175,19 @@ function editRoundName(e) {
 }
 
 function editRound() {
-    console.log("editRound not yet implemented");
+    console.log("editRound not yet fully implemented");
+    var roundID = $(this).attr("data-id");
+    var round = rounds[roundID];
+
+    $("#roundName").val(round.name);
+    if(round.questions[0] == "") {
+        round.questions.unshift();
+    }
+    console.log(round.questions);
+    console.log(round.questions[0]);
+    console.log(round.questions[1]);
+    
+
     $("#teams-card").hide();
     $("#rounds-card").removeClass("col-lg-8").addClass("col-lg-12");
     $("#rounds-card .default-view").hide();
@@ -177,7 +196,7 @@ function editRound() {
 
 function cancelRoundEdit() {
     console.log("cancel round edit");
-    
+
     $("#teams-card").show();
     $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
     $("#rounds-card .default-view").show();
