@@ -80,9 +80,31 @@
                     </div>
                     <div class="card-body">
                         <form>
+                            <div class="form-group">
+                                <label for="roundName">Round Name</label>
+                                <input type="text" class="form-control" id="roundName">
+                            </div>
+                            <div class="form-group">
+                                <label for="pointsPerQuestion">Points per question</label>
+                                <input type="number" class="form-control" id="ppq">
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <th scope="col">Question</th>
+                                    <th scope="col">Answer</th>
+                                    <th scope="col">Delete</th>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                            <div class="form-group">
+                                
+                            </div>
                         </form>
                     </div>
                 </div>
+            </div>
             <!-- Teams -->
             <div id="teams-card" class="col-lg-4">
                 <div class="card text-white bg-info default-view">
@@ -115,7 +137,27 @@
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Edit Team</h3>
-                        
+                            <span class="col-4 text-right team-commands">
+                                <button class="btn btn-default cancel-team-edit" data-type="team">
+                                    <span class="octicon octicon-x"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-body table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Team Name</th>
+                                        <th scope="col">Round Score</th>
+                                        <th scope="col">Cumulative Score</th>
+                                        <th scope="col">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="team-list">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -134,7 +176,8 @@
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete
-                    <span id="delete-type"></span> '<span id="delete-name"></span>'?
+                    <span id="delete-type"></span> '
+                    <span id="delete-name"></span>'?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
