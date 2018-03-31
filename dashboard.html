@@ -105,9 +105,9 @@
                     </div>
                 </div>
             </div>
+            <!-- Teams -->
             <div id="teams-card" class="col-lg-4">
-                <!-- Teams -->
-                <div class="card text-white bg-info">
+                <div class="card text-white bg-info default-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Teams</h3>
@@ -131,6 +131,34 @@
                             <tbody id="team-list">
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="card text-white bg-info edit-view">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Edit Team</h3>
+                            <span class="col-4 text-right team-commands">
+                                <button class="btn btn-default cancel-team-edit" data-type="team">
+                                    <span class="octicon octicon-x"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-body table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Team Name</th>
+                                        <th scope="col">Round Score</th>
+                                        <th scope="col">Cumulative Score</th>
+                                        <th scope="col">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="team-list">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
