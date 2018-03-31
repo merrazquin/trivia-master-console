@@ -40,8 +40,8 @@
     <div class="container">
         <div class="row">
             <!-- Rounds -->
-            <div class="col-lg-8">
-                <div class="card text-white bg-info">
+            <div id="rounds-card" class="col-lg-8">
+                <div class="card text-white bg-info default-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
@@ -67,8 +67,45 @@
                         </table>
                     </div>
                 </div>
+                <div class="card text-white bg-info edit-view">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Edit Round</h3>
+                            <span class="col-4 text-right round-commands">
+                                <button class="btn btn-default cancel-round-edit" data-type="round">
+                                    <span class="octicon octicon-x"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="roundName">Round Name</label>
+                                <input type="text" class="form-control" id="roundName">
+                            </div>
+                            <div class="form-group">
+                                <label for="pointsPerQuestion">Points per question</label>
+                                <input type="number" class="form-control" id="ppq">
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <th scope="col">Question</th>
+                                    <th scope="col">Answer</th>
+                                    <th scope="col">Delete</th>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                            <div class="form-group">
+                                
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4">
+            <div id="teams-card" class="col-lg-4">
                 <!-- Teams -->
                 <div class="card text-white bg-info">
                     <div class="card-header">
@@ -111,7 +148,8 @@
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete
-                    <span id="delete-type"></span> '<span id="delete-name"></span>'?
+                    <span id="delete-type"></span> '
+                    <span id="delete-name"></span>'?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
