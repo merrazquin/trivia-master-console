@@ -46,7 +46,7 @@
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
                             <span class="col-4 text-right round-commands">
-                                <button class="btn btn-default add-round" data-toggle="modal" data-target="#addModal">
+                                <button class="btn btn-default" data-type="round" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
                             </span>
@@ -75,7 +75,7 @@
                         <div class="row">
                             <h3 class="card-title col-8">Teams</h3>
                             <span class="col-4 text-right team-commands">
-                                <button class="btn btn-default add-team" data-toggle="modal" data-target="#addModal">
+                                <button class="btn btn-default" data-type="team" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
                             </span>
@@ -111,8 +111,7 @@
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete
-                    <span id="delete-type"></span> '
-                    <span id="delete-name"></span>'?
+                    <span id="delete-type"></span> '<span id="delete-name"></span>'?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -153,6 +152,7 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
+    <script src="scripts/jquery.editable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>

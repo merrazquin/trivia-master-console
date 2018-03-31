@@ -6074,4 +6074,7 @@ a.text-dark:hover, a.text-dark:focus {
 .card {
   margin-bottom: 1.2rem; }
 
+tbody th {
+  cursor: pointer; }
+
 /*# sourceMappingURL=bootstrap.css.map */
