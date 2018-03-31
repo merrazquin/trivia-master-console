@@ -18,15 +18,14 @@ function handleDatabaseError(error) {
 }
 
 var uid;
-var initApp = function () {
-    firebase.auth().onAuthStateChanged(function (user) {
+var initApp = function() {
+    firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
             // User is signed in.
             uid = user.uid;
             $("#user-info").text(user.displayName + " (" + user.email + ")");
 
-            try { onAuth(user); }
-            catch (e) {
+            try { onAuth(user); } catch (e) {
                 if (e.name != "ReferenceError") {
                     console.log("Error:", e);
                 }
@@ -35,22 +34,22 @@ var initApp = function () {
             // User is signed out, redirect to login page
             window.location.replace("index.html");
         }
-    }, function (error) {
+    }, function(error) {
         console.log(error);
     });
 };
 
-$(function () {
+$(function() {
     if (location.href.indexOf("index.html") == -1) {
-        initApp()
+        initApp();
     }
 });
 
 $("#logout").click(() => {
-    firebase.auth().signOut().then(function () {
+    firebase.auth().signOut().then(function() {
         console.log('Signed Out');
         window.location.replace("index.html");
-    }, function (error) {
+    }, function(error) {
         console.error('Sign Out Error', error);
     });
 });
@@ -68,50 +67,50 @@ function getUrlParameter(name) {
 var userRef;
 var teamRef;
 var roundsRef;
-var onAuth = function (user) {
-    userRef = database.ref("/users/" + uid);
-    teamRef = database.ref("/users/" + uid + "/teams");
-    roundsRef = database.ref("/users/" + uid + "/rounds");
+var onAuth = function(user) {
+        userRef = database.ref("/users/" + uid);
+        teamRef = database.ref("/users/" + uid + "/teams");
+        roundsRef = database.ref("/users/" + uid + "/rounds");
 
-    teamRef.on("child_added", function (childSnap) {
-        var child = childSnap.val();
+        teamRef.on("child_added", function(childSnap) {
+            var child = childSnap.val();
 
-        $("<tr>")
-            .attr("id", childSnap.key)
-            .attr("data-type", "team")
-            .append(
-                $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamname),
-                $("<td>").text(child.score),
-                $("<td>").append(editButton(childSnap.key, "edit-team")),
-                $("<td>").append(deleteButton(childSnap.key))
-            ).appendTo($("#team-list"));
-    }, handleDatabaseError);
+            $("<tr>")
+                .attr("id", childSnap.key)
+                .attr("data-type", "team")
+                .append(
+                    $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamname),
+                    $("<td>").text(child.score),
+                    $("<td>").append(editButton(childSnap.key, "edit-team")),
+                    $("<td>").append(deleteButton(childSnap.key))
+                ).appendTo($("#team-list"));
+        }, handleDatabaseError);
 
-    teamRef.on("child_removed", function (childSnap) {
-        $("#" + childSnap.key).remove();
-    }, handleDatabaseError);
+        teamRef.on("child_removed", function(childSnap) {
+            $("#" + childSnap.key).remove();
+        }, handleDatabaseError);
 
 
-    roundsRef.on("child_added", function (childSnap) {
-        var child = childSnap.val();
-        $("<tr>")
-            .attr("id", childSnap.key)
-            .attr("data-type", "round")
-            .append(
-                $("<th>").attr("scope", "row").text(child.name).editable("click", editRoundName),
-                $("<td>").append(editButton(childSnap.key, "edit-round")),
-                $("<td>").append(deleteButton(childSnap.key)),
-                $("<td>").append(runButton(childSnap.key, "run-round"))
+        roundsRef.on("child_added", function(childSnap) {
+            var child = childSnap.val();
+            $("<tr>")
+                .attr("id", childSnap.key)
+                .attr("data-type", "round")
+                .append(
+                    $("<th>").attr("scope", "row").text(child.name).editable("click", editRoundName),
+                    $("<td>").append(editButton(childSnap.key, "edit-round")),
+                    $("<td>").append(deleteButton(childSnap.key)),
+                    $("<td>").append(runButton(childSnap.key, "run-round"))
 
-            ).appendTo($("#rounds-list"));
+                ).appendTo($("#rounds-list"));
 
-    }, handleDatabaseError);
+        }, handleDatabaseError);
 
-    roundsRef.on("child_removed", function (childSnap) {
-        $("#" + childSnap.key).remove();
-    }, handleDatabaseError);
-}
-//#endregion
+        roundsRef.on("child_removed", function(childSnap) {
+            $("#" + childSnap.key).remove();
+        }, handleDatabaseError);
+    }
+    //#endregion
 
 //#region UI Builders
 function editButton(id, customClass) {
@@ -120,8 +119,7 @@ function editButton(id, customClass) {
     return $("<button>")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>')
-        ;
+        .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>');
 }
 
 function deleteButton(id, customClass) {
@@ -132,8 +130,7 @@ function deleteButton(id, customClass) {
         .attr("data-target", "#deleteModal")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>')
-        ;
+        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>');
 }
 
 function runButton(id, customClass) {
@@ -142,8 +139,7 @@ function runButton(id, customClass) {
     return $("<button>")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>')
-        ;
+        .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>');
 
 }
 //#endregion
@@ -190,8 +186,8 @@ function editTeamname(e) {
     console.log(teamID);
     console.log(e.value, "vs", e.old_value);
 
-    if(e.value !== e.old_value) {
-        database.ref("/users/" + uid + "/teams/" + teamID +"/name").set(e.value);
+    if (e.value !== e.old_value) {
+        database.ref("/users/" + uid + "/teams/" + teamID + "/name").set(e.value);
     }
 }
 
@@ -211,10 +207,9 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".run-round", runRound)
     .on("click", ".modal .add-team", addTeam)
     .on("click", ".edit-team", editTeam)
-    .on("click", ".delete-team", deleteTeam)
-    ;
+    .on("click", ".delete-team", deleteTeam);
 
-$("#deleteModal").on("show.bs.modal", function (event) {
+$("#deleteModal").on("show.bs.modal", function(event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
     var type = row.attr("data-type");
@@ -233,11 +228,11 @@ $("#deleteModal").on("show.bs.modal", function (event) {
 });
 
 // give focus to the delete button once modal loads
-$("#deleteModal").on("shown.bs.modal", function (event) {
+$("#deleteModal").on("shown.bs.modal", function(event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
-$("#addModal").on("show.bs.modal", function (event) {
+$("#addModal").on("show.bs.modal", function(event) {
     var type = $(event.relatedTarget).attr("data-type");
 
 
@@ -253,12 +248,24 @@ $("#addModal").on("show.bs.modal", function (event) {
     modal.find(".btn-primary").addClass("add-" + type);
 });
 // give focus to the input field
-$("#addModal").on("shown.bs.modal", function (event) {
+$("#addModal").on("shown.bs.modal", function(event) {
     $(this).find("#entity-name").trigger("focus");
 });
-$("#addModal").on("hidden.bs.modal", function (event) {
+$("#addModal").on("hidden.bs.modal", function(event) {
     $("#entity-name").val("");
 });
 
 
 //#endregion
+
+function pullQuestion(amount, category, callback) {
+    var queryURL = "https://opentdb.com/api.php?amount=" + amount + "&category=" + category;
+    //queryURL += "4562ade6f1ae691b9cd4a4e64c681673ef59b4be9b6bd5e194464c124656892b";
+    $.getJSON(queryURL, function(result) {
+        if (callback) {
+            callback(result);
+        } else {
+            console.log(result)
+        };
+    });
+}
