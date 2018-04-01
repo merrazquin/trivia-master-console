@@ -27,11 +27,7 @@ var initApp = function () {
             var email = user.email ? (" (" + user.email + ")") : "";
             $("#user-info").text(user.displayName + email);
 
-            try { onAuth(user); } catch (e) {
-                if (e.name != "ReferenceError") {
-                    console.log("Error:", e);
-                }
-            }
+            onAuth(user);
         } else {
             // User is signed out, redirect to login page
             window.location.replace("index.html");
@@ -96,7 +92,7 @@ var userRef;
 var teamRef;
 var roundsRef;
 
-var onAuth = function (user) {
+function onAuth(user) {
     userRef = database.ref("/users/" + uid);
     teamRef = database.ref("/users/" + uid + "/teams");
     roundsRef = database.ref("/users/" + uid + "/rounds");
