@@ -85,7 +85,7 @@ function gatherQuestions(questionsObj) {
         question.id = key;
         questions.push(question);
     }
-    questions.sort(sortByOrder);    
+    questions.sort(sortByOrder);
 
     return questions;
 }
@@ -101,7 +101,7 @@ var onAuth = function (user) {
     teamRef = database.ref("/users/" + uid + "/teams");
     roundsRef = database.ref("/users/" + uid + "/rounds");
 
-    userRef.on("value", function(snap){
+    userRef.on("value", function (snap) {
         $(".loaded").show();
         $(".loading").hide();
     }, handleDatabaseError);
@@ -159,7 +159,7 @@ function reorderQuestions(event, ui) {
         var questionID = $(row).attr("id");
         var pos = index + 1;
 
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/order").set(pos);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ order: pos });
     });
 }
 //#endregion
@@ -221,7 +221,7 @@ function editRoundName(e) {
     var roundID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/name").set(e.value);
+        roundsRef.child("/" + roundID).update({ name: e.value });
     }
 }
 
@@ -322,7 +322,7 @@ function editTeamname(e) {
     var teamID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        teamRef.child("/" + teamID + "/name").set(e.value);
+        teamRef.child("/" + teamID).update({ name: e.value });
     }
 }
 // Joellen works here
@@ -365,7 +365,7 @@ function editQuestionTitle(e) {
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/question").set(e.value);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ question: e.value });
     }
 }
 
@@ -374,13 +374,13 @@ function editQuestionAnswer(e) {
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/answer").set(e.value);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ answer: e.value });
     }
 }
 
 function updatePointsPerQuestion(e) {
     var roundID = $(".add-question").attr("data-id");
-    roundsRef.child("/" + roundID + "/pointsPerQuestion").set($(this).val());
+    roundsRef.child("/" + roundID).update({ pointsPerQuestion: $(this).val() });
 }
 
 function deleteQuestion() {
