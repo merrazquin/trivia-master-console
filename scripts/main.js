@@ -69,6 +69,13 @@ function sortByOrder(a, b) {
     return a.order - b.order;
 }
 
+function fixWidthHelper(e, ui) {
+    ui.css("background-color", $(this).parents(".card").css("background-color"));
+    ui.children().each(function() {
+        $(this).width($(this).width());
+    });
+    return ui;
+}
 //#endregion
 
 //#region DB Functions
@@ -93,6 +100,9 @@ var onAuth = function (user) {
                 $("<td>").append(editButton(childSnap.key, "edit-team")),
                 $("<td>").append(deleteButton(childSnap.key))
             ).appendTo($("#team-list"));
+
+        $("#team-list").parents(".loaded").show();
+        $("#team-list").parents(".loaded").siblings(".loading").hide();
     }, handleDatabaseError);
 
     teamRef.on("child_removed", function (childSnap) {
@@ -113,6 +123,8 @@ var onAuth = function (user) {
 
             ).appendTo($("#rounds-list"));
 
+        $("#rounds-list").parents(".loaded").show();
+        $("#rounds-list").parents(".loaded").siblings(".loading").hide();
     }, handleDatabaseError);
 
     roundsRef.on("value", function (roundsSnap) {
@@ -356,6 +368,7 @@ $("#questions-list").sortable({
     placeholder: "ui-state-highlight",
     forceHelperSize: true,
     handle: ".ui-sortable-handle",
+    helper: fixWidthHelper,
     update: reorderQuestions
 });
 
