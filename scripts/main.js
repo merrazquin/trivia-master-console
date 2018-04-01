@@ -24,7 +24,8 @@ var initApp = function () {
         if (user) {
             // User is signed in.
             uid = user.uid;
-            $("#user-info").text(user.displayName + " (" + user.email + ")");
+            var email = user.email ? (" (" + user.email + ")") : "";
+            $("#user-info").text(user.displayName + email);
 
             try { onAuth(user); } catch (e) {
                 if (e.name != "ReferenceError") {
@@ -100,6 +101,11 @@ var onAuth = function (user) {
     teamRef = database.ref("/users/" + uid + "/teams");
     roundsRef = database.ref("/users/" + uid + "/rounds");
 
+    userRef.on("value", function(snap){
+        $(".loaded").show();
+        $(".loading").hide();
+    }, handleDatabaseError);
+
     teamRef.on("child_added", function (childSnap) {
         var child = childSnap.val();
 
@@ -112,9 +118,6 @@ var onAuth = function (user) {
                 $("<td>").append(editButton(childSnap.key, "edit-team")),
                 $("<td>").append(deleteButton(childSnap.key))
             ).appendTo($("#team-list"));
-
-        $("#team-list").parents(".loaded").show();
-        $("#team-list").parents(".loaded").siblings(".loading").hide();
     }, handleDatabaseError);
 
     teamRef.on("child_removed", function (childSnap) {
@@ -135,9 +138,6 @@ var onAuth = function (user) {
                 $("<td>").append(runButton(childSnap.key, "run-round"))
 
             ).appendTo($("#rounds-list"));
-
-        $("#rounds-list").parents(".loaded").show();
-        $("#rounds-list").parents(".loaded").siblings(".loading").hide();
     }, handleDatabaseError);
 
     roundsRef.on("value", function (roundsSnap) {
