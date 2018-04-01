@@ -24,8 +24,7 @@
                 </li>
             </ul>
             <span class="navbar-text">
-                Logged in as
-                <span id="user-info"></span>&nbsp;
+                <span id="user-info">Logging in...</span>&nbsp;
             </span>
             <a class="btn btn-info btn-sm" href="#" role="button" id="logout">Log out</a>
         </div>
@@ -53,7 +52,12 @@
                         </div>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-sm">
+                        <div class="sk-three-bounce loading">
+                            <div class="sk-child sk-bounce1"></div>
+                            <div class="sk-child sk-bounce2"></div>
+                            <div class="sk-child sk-bounce3"></div>
+                        </div>
+                        <table class="table table-sm loaded">
                             <thead>
                                 <tr>
                                     <th scope="col">Round Name</th>
@@ -130,7 +134,12 @@
                         </div>
                     </div>
                     <div class="card-body table-responsive">
-                        <table class="table table-sm">
+                        <div class="sk-three-bounce loading">
+                            <div class="sk-child sk-bounce1"></div>
+                            <div class="sk-child sk-bounce2"></div>
+                            <div class="sk-child sk-bounce3"></div>
+                        </div>
+                        <table class="table table-sm loaded">
                             <thead>
                                 <tr>
                                     <th scope="col">Team Name</th>
