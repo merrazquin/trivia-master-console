@@ -7603,11 +7603,43 @@ tbody th {
 .edit-view, .loaded {
   display: none; }
 
+#round-print, #round-print * {
+  visibility: hidden; }
+
 .ui-sortable-placeholder {
   background-color: #17a2b8;
   border: 1px dashed rgba(0, 0, 0, 0.03); }
 
 .ui-sortable-handle {
   cursor: pointer; }
+
+#round-print {
+  font-size: 2rem; }
+
+#round-print th, #round-print td {
+  padding: 1rem; }
+
+#round-print tr {
+  border-bottom: 1px solid #000; }
+
+#round-print tr:last-of-type {
+  border-bottom: none; }
+
+#round-print table {
+  width: 100%;
+  border: 1px solid #000; }
+
+.octicon {
+  padding-left: 4px; }
+
+@media print {
+  body * {
+    visibility: hidden; }
+  #round-print, #round-print * {
+    visibility: visible; }
+  #round-print {
+    position: absolute;
+    left: 0;
+    top: 0; } }
 
 /*# sourceMappingURL=bootstrap.css.map */

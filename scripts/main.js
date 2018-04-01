@@ -71,10 +71,22 @@ function sortByOrder(a, b) {
 
 function fixWidthHelper(e, ui) {
     ui.css("background-color", $(this).parents(".card").css("background-color"));
-    ui.children().each(function() {
+    ui.children().each(function () {
         $(this).width($(this).width());
     });
     return ui;
+}
+
+function gatherQuestions(questionsObj) {
+    var questions = [];
+    for (var key in questionsObj) {
+        var question = questionsObj[key];
+        question.id = key;
+        questions.push(question);
+    }
+    questions.sort(sortByOrder);    
+
+    return questions;
 }
 //#endregion
 
@@ -119,6 +131,7 @@ var onAuth = function (user) {
                 $("<th>").attr("scope", "row").text(child.name).editable("click", editRoundName),
                 $("<td>").append(editButton(childSnap.key, "edit-round")),
                 $("<td>").append(deleteButton(childSnap.key)),
+                $("<td>").append(printButton(childSnap.key, "print-round")),
                 $("<td>").append(runButton(childSnap.key, "run-round"))
 
             ).appendTo($("#rounds-list"));
@@ -181,6 +194,15 @@ function runButton(id, customClass) {
         .append('<span class="octicon octicon-zap" aria-hidden="true" aria-label="Run"></span>');
 
 }
+
+function printButton(id, customClass) {
+    var className = "btn btn-default";
+    if (customClass) className += " " + customClass;
+    return $("<button>")
+        .attr("data-id", id)
+        .addClass(className)
+        .append('<span class="octicon octicon-primitive-dot" aria-hidden="true" aria-label="Print"></span>');
+}
 //#endregion
 
 //#region Main functionality
@@ -228,13 +250,7 @@ function updateQuestionsList() {
     if (roundID) {
         var round = rounds[roundID];
         if (round) {
-            var questions = [];
-            for (var key in round.questions) {
-                var question = round.questions[key];
-                question.id = key;
-                questions.push(question);
-            }
-            questions.sort(sortByOrder);
+            var questions = gatherQuestions(round.questions);
 
             $("#questions-list").empty();
 
@@ -265,6 +281,32 @@ function deleteRound() {
 
 function runRound() {
     window.location.href = "run-round.html?id=" + $(this).attr("data-id");
+}
+
+function printRound() {
+    var roundID = $(this).attr("data-id");
+
+    if (roundID) {
+        var round = rounds[roundID];
+        if (round) {
+            var questions = gatherQuestions(round.questions);
+            console.log(questions)
+            $("#round-print h1").text(round.name + " (ANSWER SHEET)");
+            $("#round-print tbody").empty();
+
+            var pos = 0;
+            questions.forEach(question => {
+                $("<tr>").append(
+                    $("<td>").text(++pos),
+                    $("<th>").text(question.question),
+                    $("<td>").text(question.answer)
+                ).appendTo($("#round-print tbody"));
+            });
+        }
+    }
+
+
+    window.print();
 }
 
 function addTeam(e) {
@@ -354,6 +396,7 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".edit-round", editRound)
     .on("click", ".delete-round", deleteRound)
     .on("click", ".run-round", runRound)
+    .on("click", ".print-round", printRound)
     .on("click", ".modal .add-team", addTeam)
     .on("click", ".edit-team", editTeam)
     .on("click", ".delete-team", deleteTeam)
