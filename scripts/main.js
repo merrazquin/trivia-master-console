@@ -1,5 +1,14 @@
+var database,
+    uid,
+    rounds,
+    config,
+    userRef,
+    teamRef,
+    roundsRef;
+
+
 // Initialize Firebase
-var config = {
+config = {
     apiKey: "AIzaSyC4uRR38L_nrqTz0CR636MT3tsq7J4E8XA",
     authDomain: "trivia-master-console.firebaseapp.com",
     databaseURL: "https://trivia-master-console.firebaseio.com",
@@ -8,45 +17,28 @@ var config = {
     messagingSenderId: "1019033614397"
 };
 firebase.initializeApp(config);
-
-var database = firebase.database();
-
-function handleDatabaseError(error) {
-    console.log("Database error", error.code);
-}
-
-
-var uid,
-    rounds;
-
-var initApp = function () {
-    firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-            // User is signed in.
-            uid = user.uid;
-            var email = user.email ? (" (" + user.email + ")") : "";
-            $("#user-info").text(user.displayName + email);
-
-            try { onAuth(user); } catch (e) {
-                if (e.name != "ReferenceError") {
-                    console.log("Error:", e);
-                }
-            }
-        } else {
-            // User is signed out, redirect to login page
-            window.location.replace("index.html");
-        }
-    }, function (error) {
-        console.log(error);
-    });
-};
+database = firebase.database();
 
 $(function () {
+    // on document ready, if we're not on the index page, initialize the app
     if (location.href.indexOf("index.html") == -1) {
-        initApp();
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                // User is signed in.
+                onAuth(user);
+            } else {
+                // User is signed out, redirect to login page
+                window.location.replace("index.html");
+            }
+        }, function (error) {
+            console.log(error);
+        });
     }
 });
 
+/**
+ * When logout button is clicked, log user out and redirect to login screen
+ */
 $("#logout").click(() => {
     firebase.auth().signOut().then(function () {
         window.location.replace("index.html");
@@ -56,6 +48,18 @@ $("#logout").click(() => {
 });
 
 //#region Helper Functions
+/**
+ * For any database erro, log error code to the console
+ * @param {object} error 
+ */
+function handleDatabaseError(error) {
+    console.log("Database error", error.code);
+}
+
+/**
+ * Get a URL param by name
+ * @param {string} name 
+ */
 function getUrlParameter(name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -63,6 +67,11 @@ function getUrlParameter(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
+/**
+ * Sorts objects by "order" property
+ * @param {object} a 
+ * @param {object} b 
+ */
 function sortByOrder(a, b) {
     if (!a.order || !b.order) {
         return 0;
@@ -70,6 +79,11 @@ function sortByOrder(a, b) {
     return a.order - b.order;
 }
 
+/**
+ * Helps maintain size and color of draggable item
+ * @param {object} e 
+ * @param {object} ui 
+ */
 function fixWidthHelper(e, ui) {
     ui.css("background-color", $(this).parents(".card").css("background-color"));
     ui.children().each(function () {
@@ -78,6 +92,10 @@ function fixWidthHelper(e, ui) {
     return ui;
 }
 
+/**
+ * Returns questions object as an array includes the key in the id property
+ * @param {object} questionsObj 
+ */
 function gatherQuestions(questionsObj) {
     var questions = [];
     for (var key in questionsObj) {
@@ -85,27 +103,34 @@ function gatherQuestions(questionsObj) {
         question.id = key;
         questions.push(question);
     }
-    questions.sort(sortByOrder);    
+    questions.sort(sortByOrder);
 
     return questions;
 }
 //#endregion
 
 //#region DB Functions
-var userRef;
-var teamRef;
-var roundsRef;
+/**
+ * Once user has been authorized, update UI
+ * @param {object} user 
+ */
+function onAuth(user) {
+    uid = user.uid;
 
-var onAuth = function (user) {
+    var email = user.email ? (" (" + user.email + ")") : "";
+    $("#user-info").text(user.displayName + email);
+
     userRef = database.ref("/users/" + uid);
     teamRef = database.ref("/users/" + uid + "/teams");
     roundsRef = database.ref("/users/" + uid + "/rounds");
 
-    userRef.on("value", function(snap){
+    // once user info has been pulled, hide loading divs
+    userRef.on("value", function (snap) {
         $(".loaded").show();
         $(".loading").hide();
     }, handleDatabaseError);
 
+    // when a team is added to the DB, add it to the display
     teamRef.on("child_added", function (childSnap) {
         var child = childSnap.val();
 
@@ -113,18 +138,32 @@ var onAuth = function (user) {
             .attr("id", childSnap.key)
             .attr("data-type", "team")
             .append(
-                $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamname),
+                $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamName),
                 $("<td>").text(child.score),
                 $("<td>").append(editButton(childSnap.key, "edit-team")),
                 $("<td>").append(deleteButton(childSnap.key))
             ).appendTo($("#team-list"));
     }, handleDatabaseError);
 
+    // when a team is removed from the DB, remove it from the display
     teamRef.on("child_removed", function (childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
 
+    // when the rounds are updated, update the question list
+    roundsRef.on("value", function (roundsSnap) {
+        rounds = roundsSnap.val();
 
+        // update the round names
+        for (var key in rounds) {
+            $("#" + key).find("th").text(rounds[key].name);
+        }
+
+        updateQuestionsList();
+
+    }, handleDatabaseError);
+
+    // when a round is added to the DB, add it to the display
     roundsRef.on("child_added", function (childSnap) {
         var child = childSnap.val();
         $("<tr>")
@@ -140,18 +179,17 @@ var onAuth = function (user) {
             ).appendTo($("#rounds-list"));
     }, handleDatabaseError);
 
-    roundsRef.on("value", function (roundsSnap) {
-        rounds = roundsSnap.val();
-        updateQuestionsList();
-
-    }, handleDatabaseError);
-
+    // when a round is removed from the DB, remove it from the display
     roundsRef.on("child_removed", function (childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
 }
 
-
+/**
+ * Called when questions have been re-ordered. Will update order property in the DB
+ * @param {object} event 
+ * @param {object} ui 
+ */
 function reorderQuestions(event, ui) {
     var roundID = $(".add-question").attr("data-id");
 
@@ -159,12 +197,17 @@ function reorderQuestions(event, ui) {
         var questionID = $(row).attr("id");
         var pos = index + 1;
 
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/order").set(pos);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ order: pos });
     });
 }
 //#endregion
 
 //#region UI Builders
+/**
+ * Creates an edit button with an optional customClass
+ * @param {string} id 
+ * @param {string} customClass 
+ */
 function editButton(id, customClass) {
     var className = "btn btn-default";
     if (customClass) className += " " + customClass;
@@ -174,6 +217,11 @@ function editButton(id, customClass) {
         .append('<span class="octicon octicon-pencil" aria-hidden="true" aria-label="Edit"></span>');
 }
 
+/**
+ * Creates a delete button with an optional customClass
+ * @param {string} id 
+ * @param {string} customClass 
+ */
 function deleteButton(id, customClass) {
     var className = "btn btn-default";
     if (customClass) className += " " + customClass;
@@ -185,6 +233,11 @@ function deleteButton(id, customClass) {
         .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>');
 }
 
+/**
+ * Creates a run button with an optional customClas
+ * @param {string} id 
+ * @param {string} customClass 
+ */
 function runButton(id, customClass) {
     var className = "btn btn-default";
     if (customClass) className += " " + customClass;
@@ -195,6 +248,11 @@ function runButton(id, customClass) {
 
 }
 
+/**
+ * Creates a print button with an optional customClas
+ * @param {string} id 
+ * @param {string} customClass 
+ */
 function printButton(id, customClass) {
     var className = "btn btn-default";
     if (customClass) className += " " + customClass;
@@ -206,6 +264,10 @@ function printButton(id, customClass) {
 //#endregion
 
 //#region Main functionality
+/**
+ * Creates a new round with the name provided in the add modal, and 1 as the default points per question
+ * @param {object} e 
+ */
 function addRound(e) {
     e.preventDefault();
 
@@ -217,14 +279,26 @@ function addRound(e) {
     }
 }
 
+/**
+ * Edit the round name (checks to see if event came from quick edit or round edit)
+ * @param {object} e 
+ */
 function editRoundName(e) {
-    var roundID = e.target.parents("tr").attr("id");
+    var roundEdit = e.target == $("#roundName")[0];
+    var roundID = roundEdit ? $(".add-question").attr("data-id") : e.target.parents("tr").attr("id");
+    var newVal = roundEdit ? $(e.target).val() : e.value;
+    var oldVal = roundEdit ? rounds[roundID].name : e.old_value;
 
-    if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/name").set(e.value);
+    if (newVal !== oldVal) {
+        roundsRef.child("/" + roundID).update({ name: newVal });
     }
 }
 
+/**
+ * Edit round by either id or event target's data-id
+ * @param {object} e 
+ * @param {string} id  
+ */
 function editRound(e, id) {
     var roundID = id || $(this).attr("data-id");
     var round = rounds[roundID];
@@ -244,6 +318,9 @@ function editRound(e, id) {
     $("#rounds-card .edit-view").show();
 }
 
+/**
+ * Refresh the questions table
+ */
 function updateQuestionsList() {
     var roundID = $(".add-question").attr("data-id");
 
@@ -267,6 +344,9 @@ function updateQuestionsList() {
     }
 }
 
+/**
+ * Switch UI back to original dashboard
+ */
 function cancelRoundEdit() {
     $("#teams-card").show();
     $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
@@ -275,14 +355,23 @@ function cancelRoundEdit() {
     $(".add-question").attr("data-id", "");
 }
 
+/**
+ * Delete a round from the DB
+ */
 function deleteRound() {
     roundsRef.child("/" + $(this).attr("data-id")).remove();
 }
 
+/**
+ * Launch the "slideshow" for the round
+ */
 function runRound() {
     window.location.href = "run-round.html?id=" + $(this).attr("data-id");
 }
 
+/**
+ * Print the "answer sheet" for the round
+ */
 function printRound() {
     var roundID = $(this).attr("data-id");
 
@@ -305,10 +394,13 @@ function printRound() {
         }
     }
 
-
     window.print();
 }
 
+/**
+ * Creates a new team with the name provided in the add modal
+ * @param {object} e 
+ */
 function addTeam(e) {
     e.preventDefault();
     var teamName = $("#entity-name").val().trim();
@@ -318,11 +410,15 @@ function addTeam(e) {
     }
 }
 
-function editTeamname(e) {
+/**
+ * Update the team's name in the DB
+ * @param {object} e 
+ */
+function editTeamName(e) {
     var teamID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        teamRef.child("/" + teamID + "/name").set(e.value);
+        teamRef.child("/" + teamID).update({ name: e.value });
     }
 }
 // Joellen works here
@@ -349,10 +445,17 @@ function cancelEditTeam() {
 }
 // Joellen stops working here
 
+/**
+ * Delete team from the DB
+ */
 function deleteTeam() {
     teamRef.child("/" + $(this).attr("data-id")).remove();
 }
 
+/**
+ * Creates a question
+ * @param {object} e 
+ */
 function addQuestion(e) {
     var roundID = $(this).attr("data-id");
     var round = rounds[roundID];
@@ -360,34 +463,50 @@ function addQuestion(e) {
     roundsRef.child("/" + roundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: order });
 }
 
+/**
+ * Update question's title in the DB
+ * @param {object} e 
+ */
 function editQuestionTitle(e) {
     var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/question").set(e.value);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ question: e.value });
     }
 }
 
+/**
+ * Update question's answer in the DB
+ * @param {object} e 
+ */
 function editQuestionAnswer(e) {
     var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID + "/answer").set(e.value);
+        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ answer: e.value });
     }
 }
 
+/**
+ * Update round's points per question in teh DB
+ * @param {object} e 
+ */
 function updatePointsPerQuestion(e) {
     var roundID = $(".add-question").attr("data-id");
-    roundsRef.child("/" + roundID + "/pointsPerQuestion").set($(this).val());
+    roundsRef.child("/" + roundID).update({ pointsPerQuestion: $(this).val() });
 }
 
+/**
+ * Delete question from DB, update order of questions for round
+ */
 function deleteQuestion() {
     var roundID = $(".add-question").attr("data-id");
     var questionID = $(this).attr("data-id");
 
     roundsRef.child("/" + roundID + "/questions/" + questionID).remove();
+    reorderQuestions();
 }
 //#endregion
 
@@ -405,8 +524,12 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("click", ".add-question", addQuestion)
     .on("click", ".delete-question", deleteQuestion)
     .on("input", "#ppq", updatePointsPerQuestion)
+    .on("input", "#roundName", editRoundName)
     ;
 
+/**
+ * Handle drag & drop sorting of questions
+ */
 $("#questions-list").sortable({
     placeholder: "ui-state-highlight",
     forceHelperSize: true,
@@ -415,6 +538,9 @@ $("#questions-list").sortable({
     update: reorderQuestions
 });
 
+/**
+ * When Delete modal is triggered, update functionality based off type
+ */
 $("#deleteModal").on("show.bs.modal", function (event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
@@ -438,6 +564,9 @@ $("#deleteModal").on("shown.bs.modal", function (event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
+/**
+ * When Add modal is triggered, update functionality based off type
+ */
 $("#addModal").on("show.bs.modal", function (event) {
     var type = $(event.relatedTarget).attr("data-type");
     var modal = $(this);
@@ -451,15 +580,18 @@ $("#addModal").on("show.bs.modal", function (event) {
     // set the correct class to target addition
     modal.find(".btn-primary").addClass("add-" + type);
 });
+
 // give focus to the input field
 $("#addModal").on("shown.bs.modal", function (event) {
     $(this).find("#entity-name").trigger("focus");
 });
+
+/**
+ * When Add modal is dismissed, reset form
+ */
 $("#addModal").on("hidden.bs.modal", function (event) {
     $("#entity-name").val("");
 });
-
-
 //#endregion
 
 
@@ -481,6 +613,9 @@ function pullQuestion(amount, category, callback) {
 //#region roundCreation
 var queryURL = "https://opentdb.com/api_category.php";
 
+/**
+ * populate the categories drop down
+ */
 $.ajax({
     url: queryURL,
     method: 'GET'
