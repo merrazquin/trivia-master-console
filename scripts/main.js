@@ -27,6 +27,25 @@ $(function () {
             if (user) {
                 // User is signed in.
                 onAuth(user);
+
+                $(document)
+                    .on("submit", "#add-api-question-form", pullAPIQuestions)
+                    .on("submit", ".modal form", addEntity)
+                    .on("submit", "#add-custom-question-form", addCustomQuestion)
+                    .on("click", ".edit-round", editRound)
+                    .on("click", ".delete-round", deleteRound)
+                    .on("click", ".run-round", runRound)
+                    .on("click", ".print-round", printRound)
+                    .on("click", ".edit-team", editTeam)
+                    .on("click", ".delete-team", deleteTeam)
+                    .on("click", ".cancel-round-edit", cancelRoundEdit)
+                    .on("click", ".cancel-team-edit", cancelEditTeam)
+                    .on("click", ".add-question", addQuestionOfType)
+                    .on("click", "#add-custom-question-submit", addCustomQuestion)
+                    .on("click", ".delete-question", deleteQuestion)
+                    .on("input", "#ppq", updatePointsPerQuestion)
+                    .on("input", "#roundName", editRoundName)
+                    ;
             } else {
                 // User is signed out, redirect to login page
                 window.location.replace("index.html");
@@ -263,14 +282,29 @@ function printButton(id, customClass) {
 //#endregion
 
 //#region Main functionality
+
+function addEntity(e) {
+    e.preventDefault();
+    var type = $(e.target).attr("role");
+    var val = $("#entity-name").val().trim();
+
+    switch (type) {
+        case "team":
+            addTeam(val);
+            break;
+        case "round":
+            addRound(val);
+            break;
+        default:
+            console.log(type, "not handled in addEntity");
+    }
+}
+
 /**
  * Creates a new round with the name provided in the add modal, and 1 as the default points per question
- * @param {object} e 
+ * @param {string} roundName 
  */
-function addRound(e) {
-    e.preventDefault();
-
-    var roundName = $("#entity-name").val().trim();
+function addRound(roundName) {
     if (roundsRef && roundName.length) {
         var round = roundsRef.push({ name: roundName, pointsPerQuestion: 1 });
         $("#addModal").modal("hide");
@@ -395,11 +429,9 @@ function printRound() {
 
 /**
  * Creates a new team with the name provided in the add modal
- * @param {object} e 
+ * @param {string} teamName 
  */
-function addTeam(e) {
-    e.preventDefault();
-    var teamName = $("#entity-name").val().trim();
+function addTeam(teamName) {
     if (teamRef && teamName.length) {
         teamRef.push({ name: teamName, score: 0 });
         $("#addModal").modal("hide");
@@ -449,13 +481,78 @@ function deleteTeam() {
 }
 
 /**
- * Creates a question
+ * Displays either the custom or api question generation form (depending on event target)
  * @param {object} e 
  */
-function addQuestion(e) {
+function addQuestionOfType(e) {
+    var cardBody = $(this).parents(".card-body");
+    var btnID = $(this).attr("id");
+
+    cardBody.find(".option").hide();
+    switch (btnID) {
+        case "add-api-question":
+            cardBody.find(".add-api").show();
+            break;
+        case "add-custom-question":
+            cardBody.find(".add-custom").show();
+            break;
+    }
+}
+
+/**
+ * Add a question to the database using values from form
+ * @param {object} e 
+ */
+function addCustomQuestion(e) {
+    e.preventDefault();
+
+    addQuestion($("#question-title").val().trim(), $("#question-answer").val().trim());
+
+    $(e.target).trigger("reset");
+}
+
+function addQuestion(question, answer) {
     var round = rounds[currentRoundID];
     var order = round.questions ? (Object.keys(round.questions).length + 1) : 1;
-    roundsRef.child("/" + currentRoundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: order });
+    roundsRef.child("/" + currentRoundID + "/questions").push({ question: question, answer: answer, order: order });
+}
+
+function pullAPIQuestions(e) {
+    e.preventDefault();
+    var props = ["amount", "category", "difficulty", "type"];
+    var apiOptions = [];
+    props.forEach(prop => {
+        var val = $("#" + prop).val().trim();
+        if (val.length) {
+            apiOptions.push(prop + "=" + val);
+        }
+    });
+
+    var queryURL = "https://opentdb.com/api.php?" + apiOptions.join("&");
+    console.log(queryURL);
+    $.getJSON(queryURL, function (result) {
+        console.log(result)
+        switch (result.response_code) {
+            case 0: // success
+                var results = result.results;
+
+                results.forEach(questionObj => {
+                    addQuestion(questionObj.question, questionObj.correct_answer);
+                });
+                break;
+            case 1: // no results
+                break;
+            case 2: // invalid parameter
+                break;
+            case 3: // token not found
+                break;
+            case 4: // token empty 
+                break;
+        }
+
+    }, function (error) {
+        // todo: handle error
+    });
 }
 
 /**
@@ -502,23 +599,6 @@ function deleteQuestion() {
 //#endregion
 
 //#region Event Handlers
-$(document).on("click", ".modal .add-round", addRound)
-    .on("click", ".edit-round", editRound)
-    .on("click", ".delete-round", deleteRound)
-    .on("click", ".run-round", runRound)
-    .on("click", ".print-round", printRound)
-    .on("click", ".modal .add-team", addTeam)
-    .on("click", ".edit-team", editTeam)
-    .on("click", ".delete-team", deleteTeam)
-    .on("click", ".cancel-round-edit", cancelRoundEdit)
-    .on("click", ".cancel-team-edit", cancelEditTeam)
-    .on("click", ".add-question", addQuestion)
-    .on("click", ".delete-question", deleteQuestion)
-    .on("input", "#ppq", updatePointsPerQuestion)
-    .on("input", "#roundName", editRoundName)
-    ;
-
-
 if ($("#questions-list").length) {
     /**
      * Handle drag & drop sorting of questions
@@ -570,8 +650,8 @@ $("#addModal").on("show.bs.modal", function (event) {
     // display the type of entity being added
     modal.find(".add-type").text(type);
 
-    // set the correct class to target addition
-    modal.find(".btn-primary").addClass("add-" + type);
+    // set the correct role to target addition
+    modal.find("form").attr("role", type);
 });
 
 // give focus to the input field
@@ -583,7 +663,7 @@ $("#addModal").on("shown.bs.modal", function (event) {
  * When Add modal is dismissed, reset form
  */
 $("#addModal").on("hidden.bs.modal", function (event) {
-    $("#entity-name").val("");
+    $(this).find("form").trigger("reset");
 });
 //#endregion
 
@@ -609,15 +689,15 @@ var queryURL = "https://opentdb.com/api_category.php";
 /**
  * populate the categories drop down
  */
-/*$.ajax({
+$.ajax({
     url: queryURL,
     method: 'GET'
 }).then(function (response) {
     var categories = "";
     for (i = 0; i < response.trivia_categories.length; i++) {
-        categories = categories + "<option value=" + response.trivia_categories[i].name + "> " + response.trivia_categories[i].name + "</option>";
+        categories = categories + "<option value=" + response.trivia_categories[i].id + "> " + response.trivia_categories[i].name + "</option>";
     }
-    $("#categories").append(categories);
+    $("#category").append(categories);
 
-});*/
+});
 //#endregion

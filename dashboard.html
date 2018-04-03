@@ -101,9 +101,6 @@
                                 </div>
                             </div>
                         </div>
-                        <p>
-                            <button class="btn btn-default add-question">Add Question(s)</button>
-                        </p>
                         <table class="table">
                             <thead>
                                 <th scope="col">Order</th>
@@ -115,17 +112,11 @@
 
                             </tbody>
                         </table>
-                        <p>
-                            <button class="btn btn-default add-question">Add Question(s)</button>
-                        </p>
-                        <div class="form-group">
-
-                        </div>
                     </div>
                 </div>
                 <!-- #endregion -->
                 <!-- #region Question -->
-                <div class="card text-white bg-info question-add-view">
+                <div class="card text-white bg-info edit-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Add Questions</h3>
@@ -137,14 +128,59 @@
                         </div>
                     </div>
                     <div class="card-body table-responsive">
-                        <button id="add-api-question" class="btn btn-default add-question">Add from API</button>
-                        <button id="add-custom-question" class="btn btn-default add-question">Add Custom</button>
-
+                        <p>
+                            <button id="add-api-question" class="btn btn-default add-question">Add from API</button>
+                            <button id="add-custom-question" class="btn btn-default add-question">Add Custom</button>
+                        </p>
                         <div class="add-api option">
-                            API
+                            <form id="add-api-question-form">
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto">
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">Qty</div>
+                                            </div>
+                                            <input id="amount" class="form-control" type="number" value="1" min="1" max="50">
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-control mb-2" id="category">
+                                            <option value="">Any Category</option>
+                                        </select>  
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-control mb-2" id="difficulty">
+                                            <option value="">Any Difficulty</option>
+                                            <option value="easy">Easy</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="hard">Hard</option>
+                                        </select>  
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-control mb-2" id="type">
+                                            <option value="">Any Type</option>
+                                            <option value="multiple">Multiple</option>
+                                            <option value="boolean">True/False</option>
+                                        </select>  
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-default mb-2">Pull</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="add-custom option">
-                            Custom
+                            <form id="add-custom-question-form">
+                                <div class="form-group">
+                                    <label for="question-title">Question</label>
+                                    <input type="text" class="form-control" id="question-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="question-answer">Answer</label>
+                                    <input class="form-control" type="text" id="question-answer" required>
+                                </div>
+                                <button type="submit" class="btn btn-default">Add</button>
+                            </form>
                         </div>
                     </div>
                 </div>                
@@ -248,7 +284,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="needs-validation" novalidate>
+                <form>
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="entity-name" class="col-form-label">
