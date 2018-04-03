@@ -7600,7 +7600,7 @@ body .ui-tooltip {
 tbody th {
   cursor: pointer; }
 
-.edit-view, .loaded {
+.edit-view, .loaded, .option {
   display: none; }
 
 #round-print, #round-print * {

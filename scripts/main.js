@@ -4,7 +4,8 @@ var database,
     config,
     userRef,
     teamRef,
-    roundsRef;
+    roundsRef,
+    currentRoundID;
 
 
 // Initialize Firebase
@@ -191,13 +192,11 @@ function onAuth(user) {
  * @param {object} ui 
  */
 function reorderQuestions(event, ui) {
-    var roundID = $(".add-question").attr("data-id");
-
     $.each($("#questions-list tr"), function (index, row) {
         var questionID = $(row).attr("id");
         var pos = index + 1;
 
-        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ order: pos });
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ order: pos });
     });
 }
 //#endregion
@@ -285,7 +284,7 @@ function addRound(e) {
  */
 function editRoundName(e) {
     var roundEdit = e.target == $("#roundName")[0];
-    var roundID = roundEdit ? $(".add-question").attr("data-id") : e.target.parents("tr").attr("id");
+    var roundID = roundEdit ? currentRoundID : e.target.parents("tr").attr("id");
     var newVal = roundEdit ? $(e.target).val() : e.value;
     var oldVal = roundEdit ? rounds[roundID].name : e.old_value;
 
@@ -300,12 +299,11 @@ function editRoundName(e) {
  * @param {string} id  
  */
 function editRound(e, id) {
-    var roundID = id || $(this).attr("data-id");
-    var round = rounds[roundID];
+    currentRoundID = id || $(this).attr("data-id");
+    var round = rounds[currentRoundID];
     if (!round) {
         return;
     }
-    $(".add-question").attr("data-id", roundID);
 
     updateQuestionsList();
 
@@ -322,10 +320,8 @@ function editRound(e, id) {
  * Refresh the questions table
  */
 function updateQuestionsList() {
-    var roundID = $(".add-question").attr("data-id");
-
-    if (roundID) {
-        var round = rounds[roundID];
+    if (currentRoundID) {
+        var round = rounds[currentRoundID];
         if (round) {
             var questions = gatherQuestions(round.questions);
 
@@ -352,7 +348,7 @@ function cancelRoundEdit() {
     $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
     $("#rounds-card .default-view").show();
     $("#rounds-card .edit-view").hide();
-    $(".add-question").attr("data-id", "");
+    currentRoundID = "";
 }
 
 /**
@@ -457,10 +453,9 @@ function deleteTeam() {
  * @param {object} e 
  */
 function addQuestion(e) {
-    var roundID = $(this).attr("data-id");
-    var round = rounds[roundID];
+    var round = rounds[currentRoundID];
     var order = round.questions ? (Object.keys(round.questions).length + 1) : 1;
-    roundsRef.child("/" + roundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: order });
+    roundsRef.child("/" + currentRoundID + "/questions").push({ question: "What color is the sky?", answer: "blue", order: order });
 }
 
 /**
@@ -468,11 +463,10 @@ function addQuestion(e) {
  * @param {object} e 
  */
 function editQuestionTitle(e) {
-    var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ question: e.value });
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ question: e.value });
     }
 }
 
@@ -481,11 +475,10 @@ function editQuestionTitle(e) {
  * @param {object} e 
  */
 function editQuestionAnswer(e) {
-    var roundID = $(".add-question").attr("data-id");
     var questionID = e.target.parents("tr").attr("id");
 
     if (e.value !== e.old_value) {
-        roundsRef.child("/" + roundID + "/questions/" + questionID).update({ answer: e.value });
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ answer: e.value });
     }
 }
 
@@ -494,18 +487,16 @@ function editQuestionAnswer(e) {
  * @param {object} e 
  */
 function updatePointsPerQuestion(e) {
-    var roundID = $(".add-question").attr("data-id");
-    roundsRef.child("/" + roundID).update({ pointsPerQuestion: $(this).val() });
+    roundsRef.child("/" + currentRoundID).update({ pointsPerQuestion: $(this).val() });
 }
 
 /**
  * Delete question from DB, update order of questions for round
  */
 function deleteQuestion() {
-    var roundID = $(".add-question").attr("data-id");
     var questionID = $(this).attr("data-id");
 
-    roundsRef.child("/" + roundID + "/questions/" + questionID).remove();
+    roundsRef.child("/" + currentRoundID + "/questions/" + questionID).remove();
     reorderQuestions();
 }
 //#endregion
@@ -618,7 +609,7 @@ var queryURL = "https://opentdb.com/api_category.php";
 /**
  * populate the categories drop down
  */
-$.ajax({
+/*$.ajax({
     url: queryURL,
     method: 'GET'
 }).then(function (response) {
@@ -628,5 +619,5 @@ $.ajax({
     }
     $("#categories").append(categories);
 
-});
+});*/
 //#endregion
