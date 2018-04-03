@@ -40,11 +40,12 @@
         <div class="row">
             <!-- Rounds -->
             <div id="rounds-card" class="col-lg-8">
+                <!-- #region Rounds main -->
                 <div class="card text-white bg-info default-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Rounds</h3>
-                            <span class="col-4 text-right round-commands">
+                            <span class="col-4 text-right">
                                 <button class="btn btn-default" data-type="round" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
@@ -72,11 +73,13 @@
                         </table>
                     </div>
                 </div>
+                <!-- #endregion -->
+                <!-- #region Round edit -->
                 <div class="card text-white bg-info edit-view">
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Edit Round</h3>
-                            <span class="col-4 text-right round-commands">
+                            <span class="col-4 text-right">
                                 <button class="btn btn-default cancel-round-edit" data-type="round">
                                     <span class="octicon octicon-x"></span>
                                 </button>
@@ -99,7 +102,7 @@
                             </div>
                         </div>
                         <p>
-                            <button class="btn btn-default add-question">Add Question</button>
+                            <button class="btn btn-default add-question">Add Question(s)</button>
                         </p>
                         <table class="table">
                             <thead>
@@ -113,13 +116,30 @@
                             </tbody>
                         </table>
                         <p>
-                            <button class="btn btn-default add-question">Add Question</button>
+                            <button class="btn btn-default add-question">Add Question(s)</button>
                         </p>
                         <div class="form-group">
 
                         </div>
                     </div>
                 </div>
+                <!-- #endregion -->
+                <!-- #region Question -->
+                <div class="card text-white bg-info question-add-view">
+                    <div class="card-header">
+                        <div class="row">
+                            <h3 class="card-title col-8">Add Questions</h3>
+                            <span class="col-4 text-right">
+                                <button class="btn btn-default cancel-question-add" data-type="team">
+                                    <span class="octicon octicon-x"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive">
+                    </div>
+                </div>                
+                <!-- #endregion -->
             </div>
             <!-- Teams -->
             <div id="teams-card" class="col-lg-4">
@@ -127,7 +147,7 @@
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Teams</h3>
-                            <span class="col-4 text-right team-commands">
+                            <span class="col-4 text-right">
                                 <button class="btn btn-default" data-type="team" data-toggle="modal" data-target="#addModal">
                                     <span class="octicon octicon-plus"></span>
                                 </button>
@@ -158,7 +178,7 @@
                     <div class="card-header">
                         <div class="row">
                             <h3 class="card-title col-8">Edit Team</h3>
-                            <span class="col-4 text-right team-commands">
+                            <span class="col-4 text-right">
                                 <button class="btn btn-default cancel-team-edit" data-type="team">
                                     <span class="octicon octicon-x"></span>
                                 </button>

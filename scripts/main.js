@@ -20,8 +20,8 @@ firebase.initializeApp(config);
 database = firebase.database();
 
 $(function () {
-    // on document ready, if we're not on the index page, initialize the app
-    if (location.href.indexOf("index.html") == -1) {
+    // on document ready, if we're on the dashboard page initialize the app
+    if (location.href.indexOf("dashboard.html") != -1) {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 // User is signed in.
@@ -527,17 +527,19 @@ $(document).on("click", ".modal .add-round", addRound)
     .on("input", "#roundName", editRoundName)
     ;
 
-/**
- * Handle drag & drop sorting of questions
- */
-$("#questions-list").sortable({
-    placeholder: "ui-state-highlight",
-    forceHelperSize: true,
-    handle: ".ui-sortable-handle",
-    helper: fixWidthHelper,
-    update: reorderQuestions
-});
 
+if ($("#questions-list").length) {
+    /**
+     * Handle drag & drop sorting of questions
+     */
+    $("#questions-list").sortable({
+        placeholder: "ui-state-highlight",
+        forceHelperSize: true,
+        handle: ".ui-sortable-handle",
+        helper: fixWidthHelper,
+        update: reorderQuestions
+    });
+}
 /**
  * When Delete modal is triggered, update functionality based off type
  */
