@@ -234,7 +234,7 @@ function deleteButton(id, customClass) {
 }
 
 /**
- * Creates a run button with an optional customClas
+ * Creates a run button with an optional customClass
  * @param {string} id 
  * @param {string} customClass 
  */
@@ -249,7 +249,7 @@ function runButton(id, customClass) {
 }
 
 /**
- * Creates a print button with an optional customClas
+ * Creates a print button with an optional customClass
  * @param {string} id 
  * @param {string} customClass 
  */
@@ -422,19 +422,31 @@ function editTeamName(e) {
     }
 }
 // Joellen works here
-function editTeam() {
+/**
+ * Edit round by either id or event target's data-id
+ * @param {object} e 
+ * @param {string} id  
+ */
+function editTeam(e, id) {
     $("#rounds-card").hide();
     $("#teams-card").removeClass("col-lg-4").addClass("col-lg-12");
     $("#teams-card .default-view").hide();
     $("#teams-card .edit-view").show();
     var roundScore = 0;
-    var scoreSum = 0;
-    // after the roundScore has been input by the user, we will want to push that value into scoreSum
-    // grab the input from the form so we know what roundScore is
-    // push to scoreSum which is what displays on the form
-    // scoreSum will hold that tallying score, roundScore will provide the number to add to the exisiting number of scoreSum
+    var totalScore = 0;
+    var teamID = teamName;
+    console.log(teamName);
+    // displaying totalScore into total-score
+    $("<tr>")
+    .append(
+        $("<td>").text(child.score),
+    ).appendTo($("#total-score"));
 
-    console.log("editTeam not yet implemented");
+    // You need to grab the existing teamName and push it into the value field of the teamID form!
+    // dynamically add rows to your score-list table that are input forms for the user to add the score!
+        // okay so...there can be infinite rows of round scores to add, we need to create a function for adding the rounds scores together. Pretty sure this won't be a for loop, but it very well may be.  Look into arrow functions jic.
+    // when a score is input on score-list it needs to add to the existing integer of the table total-score!
+
 }
 
 function cancelEditTeam() {
