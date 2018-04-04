@@ -5,7 +5,9 @@ var database,
     userRef,
     teamRef,
     roundsRef,
-    currentRoundID;
+    currentRoundID,
+    sessionToken;
+
 
 
 // Initialize Firebase
@@ -20,10 +22,10 @@ config = {
 firebase.initializeApp(config);
 database = firebase.database();
 
-$(function () {
+$(function() {
     // on document ready, if we're on the dashboard page initialize the app
     if (location.href.indexOf("dashboard.html") != -1) {
-        firebase.auth().onAuthStateChanged(function (user) {
+        firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is signed in.
                 onAuth(user);
@@ -44,13 +46,12 @@ $(function () {
                     .on("click", "#add-custom-question-submit", addCustomQuestion)
                     .on("click", ".delete-question", deleteQuestion)
                     .on("input", "#ppq", updatePointsPerQuestion)
-                    .on("input", "#roundName", editRoundName)
-                    ;
+                    .on("input", "#roundName", editRoundName);
             } else {
                 // User is signed out, redirect to login page
                 window.location.replace("index.html");
             }
-        }, function (error) {
+        }, function(error) {
             console.log(error);
         });
     }
@@ -60,9 +61,9 @@ $(function () {
  * When logout button is clicked, log user out and redirect to login screen
  */
 $("#logout").click(() => {
-    firebase.auth().signOut().then(function () {
+    firebase.auth().signOut().then(function() {
         window.location.replace("index.html");
-    }, function (error) {
+    }, function(error) {
         console.error('Sign Out Error', error);
     });
 });
@@ -106,7 +107,7 @@ function sortByOrder(a, b) {
  */
 function fixWidthHelper(e, ui) {
     ui.css("background-color", $(this).parents(".card").css("background-color"));
-    ui.children().each(function () {
+    ui.children().each(function() {
         $(this).width($(this).width());
     });
     return ui;
@@ -144,14 +145,21 @@ function onAuth(user) {
     teamRef = database.ref("/users/" + uid + "/teams");
     roundsRef = database.ref("/users/" + uid + "/rounds");
 
-    // once user info has been pulled, hide loading divs
-    userRef.on("value", function (snap) {
+    userRef.on("value", function(snap) {
+        // once user info has been pulled, hide loading divs
         $(".loaded").show();
         $(".loading").hide();
+
+        // find user's session token
+        sessionToken = snap.val().sessionToken
+        console.log(sessionToken);
+        if (!sessionToken) {
+            retrieveSessionToken();
+        }
     }, handleDatabaseError);
 
     // when a team is added to the DB, add it to the display
-    teamRef.on("child_added", function (childSnap) {
+    teamRef.on("child_added", function(childSnap) {
         var child = childSnap.val();
 
         $("<tr>")
@@ -166,12 +174,12 @@ function onAuth(user) {
     }, handleDatabaseError);
 
     // when a team is removed from the DB, remove it from the display
-    teamRef.on("child_removed", function (childSnap) {
+    teamRef.on("child_removed", function(childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
 
     // when the rounds are updated, update the question list
-    roundsRef.on("value", function (roundsSnap) {
+    roundsRef.on("value", function(roundsSnap) {
         rounds = roundsSnap.val();
 
         // update the round names
@@ -184,7 +192,7 @@ function onAuth(user) {
     }, handleDatabaseError);
 
     // when a round is added to the DB, add it to the display
-    roundsRef.on("child_added", function (childSnap) {
+    roundsRef.on("child_added", function(childSnap) {
         var child = childSnap.val();
         $("<tr>")
             .attr("id", childSnap.key)
@@ -200,7 +208,7 @@ function onAuth(user) {
     }, handleDatabaseError);
 
     // when a round is removed from the DB, remove it from the display
-    roundsRef.on("child_removed", function (childSnap) {
+    roundsRef.on("child_removed", function(childSnap) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
 }
@@ -211,7 +219,7 @@ function onAuth(user) {
  * @param {object} ui 
  */
 function reorderQuestions(event, ui) {
-    $.each($("#questions-list tr"), function (index, row) {
+    $.each($("#questions-list tr"), function(index, row) {
         var questionID = $(row).attr("id");
         var pos = index + 1;
 
@@ -539,32 +547,8 @@ function pullAPIQuestions(e) {
             apiOptions.push(prop + "=" + val);
         }
     });
+    pullQuestion(apiOptions, handleAPIResponse)
 
-    var queryURL = "https://opentdb.com/api.php?" + apiOptions.join("&");
-    console.log(queryURL);
-    $.getJSON(queryURL, function (result) {
-        console.log(result)
-        switch (result.response_code) {
-            case 0: // success
-                var results = result.results;
-
-                results.forEach(questionObj => {
-                    addQuestion(questionObj.question, questionObj.correct_answer);
-                });
-                break;
-            case 1: // no results
-                break;
-            case 2: // invalid parameter
-                break;
-            case 3: // token not found
-                break;
-            case 4: // token empty 
-                break;
-        }
-
-    }, function (error) {
-        // todo: handle error
-    });
 }
 
 /**
@@ -626,7 +610,7 @@ if ($("#questions-list").length) {
 /**
  * When Delete modal is triggered, update functionality based off type
  */
-$("#deleteModal").on("show.bs.modal", function (event) {
+$("#deleteModal").on("show.bs.modal", function(event) {
     var id = $(event.relatedTarget).attr("data-id");
     var row = $("#" + id);
     var type = row.attr("data-type");
@@ -645,14 +629,14 @@ $("#deleteModal").on("show.bs.modal", function (event) {
 });
 
 // give focus to the delete button once modal loads
-$("#deleteModal").on("shown.bs.modal", function (event) {
+$("#deleteModal").on("shown.bs.modal", function(event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
 /**
  * When Add modal is triggered, update functionality based off type
  */
-$("#addModal").on("show.bs.modal", function (event) {
+$("#addModal").on("show.bs.modal", function(event) {
     var type = $(event.relatedTarget).attr("data-type");
     var modal = $(this);
 
@@ -667,29 +651,48 @@ $("#addModal").on("show.bs.modal", function (event) {
 });
 
 // give focus to the input field
-$("#addModal").on("shown.bs.modal", function (event) {
+$("#addModal").on("shown.bs.modal", function(event) {
     $(this).find("#entity-name").trigger("focus");
 });
 
 /**
  * When Add modal is dismissed, reset form
  */
-$("#addModal").on("hidden.bs.modal", function (event) {
+$("#addModal").on("hidden.bs.modal", function(event) {
     $(this).find("form").trigger("reset");
 });
 //#endregion
 
 
 //search function allows user to select question number and type with greater specificity
-function pullQuestion(amount, category, callback) {
-    var queryURL = "https://opentdb.com/api.php?amount=" + amount + "&category=" + category;
-    //queryURL += "4562ade6f1ae691b9cd4a4e64c681673ef59b4be9b6bd5e194464c124656892b";
-    $.getJSON(queryURL, function (result) {
-        if (callback) {
-            callback(result);
-        } else {
-            console.log(result)
-        };
+function pullQuestion(apiOptions, callback) {
+    var queryURL = "https://opentdb.com/api.php?token=" + sessionToken + "&" + apiOptions.join("&");
+    console.log(queryURL);
+    $.getJSON(queryURL, function(result) {
+        console.log(result)
+        switch (result.response_code) {
+            case 0: // success
+                callback(results);
+                break;
+            case 1: // no results 
+                break;
+            case 2: // invalid parameter
+                break;
+            case 3: // token not found
+                break;
+            case 4: // token empty 
+                break;
+        }
+
+    }, function(error) {
+        // todo: handle error
+        console.log(error);
+    });
+}
+
+function handleAPIResponse(results) {
+    results.forEach(questionObj => {
+        addQuestion(questionObj.question, questionObj.correct_answer);
     });
 }
 //I recommend the next step involve binding this function to inputs from the UI HTML, and binding the output to the appropriate area in the UI HTML
@@ -704,7 +707,7 @@ var queryURL = "https://opentdb.com/api_category.php";
 $.ajax({
     url: queryURL,
     method: 'GET'
-}).then(function (response) {
+}).then(function(response) {
     var categories = "";
     for (i = 0; i < response.trivia_categories.length; i++) {
         categories = categories + "<option value=" + response.trivia_categories[i].id + "> " + response.trivia_categories[i].name + "</option>";
@@ -712,4 +715,18 @@ $.ajax({
     $("#category").append(categories);
 
 });
+
+function retrieveSessionToken() {
+    $.getJSON("https://opentdb.com/api_token.php?command=request", setSessionToken, function(error) {
+        //to do: handle error
+        console.log(error);
+
+    });
+
+}
+
+function setSessionToken(result) {
+    sessionToken = result.token;
+    userRef.child("/sessionToken").set(sessionToken)
+}
 //#endregion
