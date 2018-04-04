@@ -6,7 +6,9 @@ var database,
     teamRef,
     roundsRef,
     currentRoundID,
-    sessionToken;
+    sessionToken,
+    sessionResetCount = 0,
+    sessionResetMax = 1;
 
 
 
@@ -34,6 +36,7 @@ $(function () {
                     .on("submit", "#add-api-question-form", pullAPIQuestions)
                     .on("submit", ".modal form", addEntity)
                     .on("submit", "#add-custom-question-form", addCustomQuestion)
+                    .on("submit", "#round-edit-form", editRoundName)
                     .on("click", ".edit-round", editRound)
                     .on("click", ".delete-round", deleteRound)
                     .on("click", ".run-round", runRound)
@@ -152,7 +155,6 @@ function onAuth(user) {
 
         // find user's session token
         sessionToken = snap.val().sessionToken
-        console.log(sessionToken);
         if (!sessionToken) {
             retrieveSessionToken();
         }
@@ -256,7 +258,7 @@ function deleteButton(id, customClass) {
         .attr("data-target", "#deleteModal")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-x" aria-hidden="true" aria-label="Delete"></span>');
+        .append('<span class="octicon octicon-trashcan" aria-hidden="true" aria-label="Delete"></span>');
 }
 
 /**
@@ -285,7 +287,7 @@ function printButton(id, customClass) {
     return $("<button>")
         .attr("data-id", id)
         .addClass(className)
-        .append('<span class="octicon octicon-primitive-dot" aria-hidden="true" aria-label="Print"></span>');
+        .append('<span class="octicon octicon-file-media" aria-hidden="true" aria-label="Print"></span>');
 }
 //#endregion
 
@@ -325,13 +327,27 @@ function addRound(roundName) {
  * @param {object} e 
  */
 function editRoundName(e) {
-    var roundEdit = e.target == $("#roundName")[0];
+    // todo: clean up this hot mess
+    if(e.target == $("#round-edit-form")[0]) {
+        e.preventDefault();
+    }
+    var roundEdit = (e.target == $("#roundName")[0] || e.target == $("#round-edit-form")[0]);
     var roundID = roundEdit ? currentRoundID : e.target.parents("tr").attr("id");
-    var newVal = roundEdit ? $(e.target).val() : e.value;
+    var newVal = roundEdit ? $("#roundName").val().trim() : e.value.trim();
     var oldVal = roundEdit ? rounds[roundID].name : e.old_value;
 
-    if (newVal !== oldVal) {
+    console.log("roundEdit", roundEdit);
+    console.log("target", e.target);
+        
+    if (roundEdit && !newVal && e.target == $("#roundName")[0]) {
+        // kludge to get validation to show
+        $('<input type="submit">').hide().appendTo($("#round-edit-form")).click().remove();
+    }
+    else if (newVal && newVal !== oldVal) {
         roundsRef.child("/" + roundID).update({ name: newVal });
+    }
+    else if(!roundEdit && !newVal) {
+        e.target.html(oldVal);
     }
 }
 
@@ -373,8 +389,8 @@ function updateQuestionsList() {
             questions.forEach(question => {
                 $("<tr>").attr("id", question.id).attr("data-type", "question").append(
                     $("<td>").addClass("ui-sortable-handle").append('<span class="octicon octicon-grabber" aria-hidden="true" aria-label="Reorder"></span> ').append(++pos),
-                    $("<th>").attr("scope", "row").editable("click", editQuestionTitle).text(question.question),
-                    $("<td>").editable("click", editQuestionAnswer).text(question.answer),
+                    $("<th>").attr("scope", "row").editable("click", editQuestionTitle).html(question.question),
+                    $("<td>").editable("click", editQuestionAnswer).html(question.answer),
                     $("<td>").append(deleteButton(question.id))
                 ).appendTo($("#questions-list"));
             });
@@ -452,9 +468,12 @@ function addTeam(teamName) {
  */
 function editTeamName(e) {
     var teamID = e.target.parents("tr").attr("id");
+    var val = e.value.trim();
 
-    if (e.value !== e.old_value) {
-        teamRef.child("/" + teamID).update({ name: e.value });
+    if (val && val !== e.old_value) {
+        teamRef.child("/" + teamID).update({ name: val });
+    } else if(!val) {
+        e.target.html(e.old_value);
     }
 }
 // Joellen works here
@@ -519,19 +538,28 @@ function addCustomQuestion(e) {
     $(e.target).trigger("reset");
 }
 
+/**
+ * Add a question to the round, using the number of existing questions to determine the sort order of the new question
+ * @param {string} question 
+ * @param {string} answer 
+ */
 function addQuestion(question, answer) {
     var round = rounds[currentRoundID];
     var order = round.questions ? (Object.keys(round.questions).length + 1) : 1;
     roundsRef.child("/" + currentRoundID + "/questions").push({ question: question, answer: answer, order: order });
 }
 
+/**
+ * Send a request to pullQuestion using the parameters set in the UI
+ * @param {object} e 
+ */
 function pullAPIQuestions(e) {
     e.preventDefault();
     var props = ["amount", "category", "difficulty", "type"];
     var apiOptions = [];
     props.forEach(prop => {
         var val = $("#" + prop).val().trim();
-        if (val.length) {
+        if (val) {
             apiOptions.push(prop + "=" + val);
         }
     });
@@ -545,9 +573,12 @@ function pullAPIQuestions(e) {
  */
 function editQuestionTitle(e) {
     var questionID = e.target.parents("tr").attr("id");
+    var val = e.value.trim();
 
-    if (e.value !== e.old_value) {
-        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ question: e.value });
+    if (val && val !== e.old_value) {
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ question: val });
+    } else if(!val) {
+        e.target.html(e.old_value);
     }
 }
 
@@ -557,9 +588,12 @@ function editQuestionTitle(e) {
  */
 function editQuestionAnswer(e) {
     var questionID = e.target.parents("tr").attr("id");
+    var val = e.value.trim();
 
-    if (e.value !== e.old_value) {
-        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ answer: e.value });
+    if (val && val !== e.old_value) {
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ answer: val });
+    } else if(!val) {
+        e.target.html(e.old_value);
     }
 }
 
@@ -617,7 +651,7 @@ $("#deleteModal").on("show.bs.modal", function (event) {
 });
 
 // give focus to the delete button once modal loads
-$("#deleteModal").on("shown.bs.modal", function (event) {
+$("#deleteModal, #alertModal").on("shown.bs.modal", function (event) {
     $(this).find(".btn-primary").trigger("focus");
 });
 
@@ -652,7 +686,11 @@ $("#addModal").on("hidden.bs.modal", function (event) {
 //#endregion
 
 
-//search function allows user to select question number and type with greater specificity
+/**
+ * Queries API using given apiOptions, and passes the data back to teh callback
+ * @param {array} apiOptions 
+ * @param {function} callback 
+ */
 function pullQuestion(apiOptions, callback) {
     var queryURL = "https://opentdb.com/api.php?token=" + sessionToken + "&" + apiOptions.join("&");
     console.log(queryURL);
@@ -662,14 +700,22 @@ function pullQuestion(apiOptions, callback) {
             case 0: // success
                 callback(result.results);
                 break;
-            case 1: // no results 
+            case 1: // no results
+                // not handling because we're using a token, so we'll get an empty token (4) response instead
                 break;
             case 2: // invalid parameter
+                // not handling as we have the parameters locked down in the UI
                 break;
             case 3: // token not found
                 retrieveSessionToken(pullQuestion, [apiOptions, callback]);
                 break;
             case 4: // token empty 
+                if (sessionResetCount < sessionResetMax) {
+                    sessionResetCount++;
+                    resetSessionToken(pullQuestion, [apiOptions, callback]);
+                } else {
+                    $("#alertModal").modal("show");
+                }
                 break;
         }
 
@@ -707,9 +753,16 @@ $.ajax({
 
 function retrieveSessionToken(callback, callbackParams) {
     $.getJSON("https://opentdb.com/api_token.php?command=request", createCallback(callback, callbackParams), function (error) {
-        //to do: handle error
+        //todo: handle error
         console.log(error);
     });
+}
+
+function resetSessionToken(callback, callbackParams) {
+    $.getJSON("https://opentdb.com/api_token.php?command=reset&token=" + sessionToken, createCallback(callback, callbackParams), function (error) {
+        // todo: handle error
+        console.log(error);
+    })
 }
 
 function createCallback(subCallback, params) {
@@ -719,6 +772,9 @@ function createCallback(subCallback, params) {
 }
 
 function setSessionToken(result, callback, params) {
+    if (sessionToken != result.token) {
+        sessionResetCount = 0;
+    }
     sessionToken = result.token;
     userRef.child("/sessionToken").set(sessionToken)
 

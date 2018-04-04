@@ -88,15 +88,17 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10">
-                                <div class="form-group">
-                                    <label for="roundName">Round Name</label>
-                                    <input type="text" class="form-control" id="roundName">
-                                </div>
+                            <div class="col-8">
+                                <form id="round-edit-form">
+                                    <div class="form-group">
+                                        <label for="roundName">Round Name</label>
+                                        <input type="text" class="form-control" id="roundName" required>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="col-2">
+                            <div class="col-4">
                                 <div class="form-group">
-                                    <label for="pointsPerQuestion">Points per question</label>
+                                    <label for="pointsPerQuestion">Points&nbsp;per&nbsp;question</label>
                                     <input id="ppq" class="form-control" type="number" min="1">
                                 </div>
                             </div>
@@ -146,7 +148,7 @@
                                     <div class="col-auto">
                                         <select class="form-control mb-2" id="category">
                                             <option value="">Any Category</option>
-                                        </select>  
+                                        </select>
                                     </div>
                                     <div class="col-auto">
                                         <select class="form-control mb-2" id="difficulty">
@@ -154,14 +156,14 @@
                                             <option value="easy">Easy</option>
                                             <option value="medium">Medium</option>
                                             <option value="hard">Hard</option>
-                                        </select>  
+                                        </select>
                                     </div>
                                     <div class="col-auto">
                                         <select class="form-control mb-2" id="type">
                                             <option value="">Any Type</option>
                                             <option value="multiple">Multiple</option>
                                             <option value="boolean">True/False</option>
-                                        </select>  
+                                        </select>
                                     </div>
                                     <div class="col-auto">
                                         <button type="submit" class="btn btn-default mb-2">Pull</button>
@@ -183,7 +185,7 @@
                             </form>
                         </div>
                     </div>
-                </div>                
+                </div>
                 <!-- #endregion -->
             </div>
             <!-- Teams -->
@@ -256,7 +258,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Confirm Deletion</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -277,7 +279,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add
+                    <h5 class="modal-title" id="addModalLabel">Add
                         <span class="add-type text-capitalize"></span>
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -300,6 +302,26 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-white bg-danger">
+                    <h5 class="modal-title" id="alertModalLabel">Error</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>No questions available.</p>
+                    <p>Please change your search parameters and try again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- #endregion -->
 
     <!-- #region Printable -->
@@ -315,9 +337,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+
                 </tbody>
-            </table> 
+            </table>
         </div>
     </div>
     <!-- #endregion -->
