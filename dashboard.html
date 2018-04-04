@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -16,29 +17,23 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home
-                        <span class="sr-only">(current)</span>
-                    </a>
-                </li>
-            </ul>
+
             <span class="navbar-text">
                 <span id="user-info">Logging in...</span>&nbsp;
             </span>
             <a class="btn btn-info btn-sm" href="#" role="button" id="logout">Log out</a>
         </div>
     </nav>
-
-
+    <!-- End Header -->
 
     <div class="jumbotron text-center">
         <h1>Trivia Master Console - Dashboard</h1>
     </div>
 
+    <!-- Game Functionality Options Begin -->
     <div class="container">
         <div class="row">
-            <!-- Rounds -->
+            <!-- ROUNDS -->
             <div id="rounds-card" class="col-lg-8">
                 <!-- #region Rounds main -->
                 <div class="card text-white bg-info default-view">
@@ -186,7 +181,7 @@
                 </div>                
                 <!-- #endregion -->
             </div>
-            <!-- Teams -->
+            <!-- TEAMS -->
             <div id="teams-card" class="col-lg-4">
                 <div class="card text-white bg-info default-view">
                     <div class="card-header">
@@ -200,6 +195,7 @@
                         </div>
                     </div>
                     <div class="card-body table-responsive">
+                        <!-- fancy loading bubbles -->
                         <div class="sk-three-bounce loading">
                             <div class="sk-child sk-bounce1"></div>
                             <div class="sk-child sk-bounce2"></div>
@@ -231,26 +227,49 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-body table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Team Name</th>
-                                        <th scope="col">Round Score</th>
-                                        <th scope="col">Cumulative Score</th>
-                                        <th scope="col">Delete</th>
-                                    </tr>
-                                </thead>
-                                <!-- JOELLEN: can't have 2 elements with same id (team-list) -->
-                                <tbody id="team-list">
-                                </tbody>
-                            </table>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="teamID">Team Name</label>
+                                    <input type="text" class="form-control" id="teamName" value="">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <table class="table table-sm loaded">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center" id="totalScore">Total Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="total-score">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                            <button class="btn btn-default input-score">Input Round Score</button>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card-body table-responsive">
+                                    <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Score</th>
+                                            <th scope="col">Delete</th>
+                                        </tr>
+                                    </thead>
+                                        <tbody id="score-list">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Game Functionality ENDS -->
+
     <!-- #region MODALS -->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
