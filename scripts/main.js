@@ -1,3 +1,7 @@
+var EDIT_ROUND = 0,
+    MAIN = 1,
+    EDIT_TEAM = 2;
+
 var database,
     uid,
     rounds,
@@ -45,9 +49,9 @@ $(function () {
                     .on("click", ".delete-team", deleteTeam)
                     .on("click", ".cancel-round-edit", cancelRoundEdit)
                     .on("click", ".cancel-team-edit", cancelEditTeam)
-                    .on("click", ".add-question", addQuestionOfType)
                     .on("click", "#add-custom-question-submit", addCustomQuestion)
                     .on("click", ".delete-question", deleteQuestion)
+                    .on("click", ".question-scroll", scrollToQuestionCreation)
                     .on("input", "#ppq", updatePointsPerQuestion)
                     .on("input", "#roundName", editRoundName);
             } else {
@@ -368,10 +372,7 @@ function editRound(e, id) {
     $("#roundName").val(round.name);
     $("#ppq").val(round.pointsPerQuestion);
 
-    $("#teams-card").hide();
-    $("#rounds-card").removeClass("col-lg-8").addClass("col-lg-12");
-    $("#rounds-card .default-view").hide();
-    $("#rounds-card .edit-view").show();
+    $("#navigation-carousel").carousel(EDIT_ROUND);
 }
 
 /**
@@ -402,11 +403,8 @@ function updateQuestionsList() {
  * Switch UI back to original dashboard
  */
 function cancelRoundEdit() {
-    $("#teams-card").show();
-    $("#rounds-card").removeClass("col-lg-12").addClass("col-lg-8");
-    $("#rounds-card .default-view").show();
-    $("#rounds-card .edit-view").hide();
     currentRoundID = "";
+    $("#navigation-carousel").carousel(MAIN);
 }
 
 /**
@@ -483,10 +481,6 @@ function editTeamName(e) {
  * @param {string} id  
  */
 function editTeam(e, id) {
-    $("#rounds-card").hide();
-    $("#teams-card").removeClass("col-lg-4").addClass("col-lg-12");
-    $("#teams-card .default-view").hide();
-    $("#teams-card .edit-view").show();
     var roundScore = 0;
     var totalScore = 0;
     var teamID = teamName;
@@ -494,9 +488,10 @@ function editTeam(e, id) {
     // displaying totalScore into total-score
     $("<tr>")
     .append(
-        $("<td>").text(child.score),
+        $("<td>").text(totalScore),
     ).appendTo($("#total-score"));
 
+    $("#navigation-carousel").carousel(EDIT_TEAM);
     // You need to grab the existing teamName and push it into the value field of the teamID form!
     // dynamically add rows to your score-list table that are input forms for the user to add the score!
         // okay so...there can be infinite rows of round scores to add, we need to create a function for adding the rounds scores together. Pretty sure this won't be a for loop, but it very well may be.  Look into arrow functions jic.
@@ -505,10 +500,7 @@ function editTeam(e, id) {
 }
 
 function cancelEditTeam() {
-    $("#rounds-card").show();
-    $("#teams-card").removeClass("col-lg-12").addClass("col-lg-4");
-    $("#teams-card .default-view").show();
-    $("#teams-card .edit-view").hide();
+    $("#navigation-carousel").carousel(MAIN);
 }
 // Joellen stops working here
 
@@ -520,22 +512,14 @@ function deleteTeam() {
 }
 
 /**
- * Displays either the custom or api question generation form (depending on event target)
+ * Scroll down to the question creation panel
  * @param {object} e 
  */
-function addQuestionOfType(e) {
-    var cardBody = $(this).parents(".card-body");
-    var btnID = $(this).attr("id");
-
-    cardBody.find(".option").hide();
-    switch (btnID) {
-        case "add-api-question":
-            cardBody.find(".add-api").show();
-            break;
-        case "add-custom-question":
-            cardBody.find(".add-custom").show();
-            break;
-    }
+function scrollToQuestionCreation(e) {
+    var speed = $("#question-addition-card").offset().top - $("html, body").scrollTop() / 8000;
+    $("html, body").animate({
+        scrollTop: $("#question-addition-card").offset().top
+    }, speed);
 }
 
 /**

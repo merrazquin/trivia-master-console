@@ -7659,4 +7659,11 @@ div.mdl-progress::after {
     left: 0;
     top: 0; } }
 
+/* prevent mask from cutting off animation */
+#navigation-carousel .carousel-item-next,
+#navigation-carousel .active.carousel-item-right,
+#navigation-carousel .carousel-item-prev,
+#navigation-carousel .active.carousel-item-left {
+  min-height: 90vh; }
+
 /*# sourceMappingURL=bootstrap.css.map */
