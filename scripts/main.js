@@ -44,7 +44,6 @@ $(function () {
                     .on("submit", "#add-custom-question-form", addCustomQuestion)
                     .on("submit", "#round-edit-form", editRoundName)
                     .on("submit", "#team-edit-form", editTeamName)
-                    .on("input", "#teamName", editTeamName)
                     .on("submit", "#round-score-form", addRoundScore)
                     .on("click", ".edit-round", editRound)
                     .on("click", ".delete-round", deleteRound)
@@ -59,7 +58,8 @@ $(function () {
                     .on("click", ".delete-question", deleteQuestion)
                     .on("click", ".question-scroll", scrollToQuestionCreation)
                     .on("input", "#ppq", updatePointsPerQuestion)
-                    .on("input", "#roundName", editRoundName);
+                    .on("input", "#roundName", editRoundName)
+                    .on("input", "#teamName", editTeamName);
             } else {
                 // User is signed out, redirect to login page
                 window.location.replace("index.html");
@@ -357,9 +357,6 @@ function editRoundName(e) {
     var newVal = roundEdit ? $("#roundName").val().trim() : e.value.trim();
     var oldVal = roundEdit ? rounds[roundID].name : e.old_value;
 
-    console.log("roundEdit", roundEdit);
-    console.log("target", e.target);
-
     if (roundEdit && !newVal && e.target == $("#roundName")[0]) {
         // kludge to get validation to show      
         console.log("validate");
@@ -487,17 +484,6 @@ function addTeam(teamName) {
  * @param {object} e 
  */
 function editTeamName(e) {
-    // var teamID = e.target.parents("tr").attr("id");
-    // var val = e.value.trim();
-
-    // if (val && val !== e.old_value) {
-    //     teamRef.child("/" + teamID).update({
-    //         name: val
-    //     });
-    // } else if (!val) {
-    //     e.target.html(e.old_value);
-    // }
-
     // todo: clean up this hot mess
     if (e.target == $("#team-edit-form")[0]) {
         e.preventDefault();
@@ -507,17 +493,11 @@ function editTeamName(e) {
     var newVal = teamEdit ? $("#teamName").val().trim() : e.value.trim();
     var oldVal = teamEdit ? teams[teamID].name : e.old_value;
 
-    console.log("teamEdit", teamEdit);
-    console.log(e.target);
-    
-    
     if (teamEdit && !newVal && e.target == $("#teamName")[0]) {
-        // kludge to get validation to show
-        console.log("validate");
-        
+        // kludge to get validation to show      
         $('<input type="submit">').hide().appendTo($("#team-edit-form")).click().remove();
     } else if (newVal && newVal !== oldVal) {
-        teamRef.child("/" + teamID).update({
+        teamsRef.child("/" + teamID).update({
             name: newVal
         });
     } else if (!teamEdit && !newVal) {
