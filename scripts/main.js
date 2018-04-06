@@ -5,9 +5,11 @@ var EDIT_ROUND = 0,
 var database,
     uid,
     rounds,
+    teams,
     config,
     userRef,
     teamRef,
+    currentTeamID,
     roundsRef,
     currentRoundID,
     sessionToken,
@@ -41,12 +43,16 @@ $(function () {
                     .on("submit", ".modal form", addEntity)
                     .on("submit", "#add-custom-question-form", addCustomQuestion)
                     .on("submit", "#round-edit-form", editRoundName)
+                    .on("submit", "#team-edit-form", editTeamName)
+                    .on("input", "#teamName", editTeamName)
+                    .on("submit", "#round-score-form", addRoundScore)
                     .on("click", ".edit-round", editRound)
                     .on("click", ".delete-round", deleteRound)
                     .on("click", ".run-round", runRound)
                     .on("click", ".print-round", printRound)
                     .on("click", ".edit-team", editTeam)
                     .on("click", ".delete-team", deleteTeam)
+                    .on("click", ".delete-score", deleteScore)
                     .on("click", ".cancel-round-edit", cancelRoundEdit)
                     .on("click", ".cancel-team-edit", cancelEditTeam)
                     .on("click", "#add-custom-question-submit", addCustomQuestion)
@@ -184,6 +190,12 @@ function onAuth(user) {
         $("#" + childSnap.key).remove();
     }, handleDatabaseError);
 
+    teamRef.on("value", function (teamSnap) {
+        teams = teamSnap.val();
+        updateTeams();
+    }, handleDatabaseError);
+
+
     // when the rounds are updated, update the question list
     roundsRef.on("value", function (roundsSnap) {
         rounds = roundsSnap.val();
@@ -229,7 +241,9 @@ function reorderQuestions(event, ui) {
         var questionID = $(row).attr("id");
         var pos = index + 1;
 
-        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ order: pos });
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({
+            order: pos
+        });
     });
 }
 //#endregion
@@ -320,7 +334,10 @@ function addEntity(e) {
  */
 function addRound(roundName) {
     if (roundsRef && roundName.length) {
-        var round = roundsRef.push({ name: roundName, pointsPerQuestion: 1 });
+        var round = roundsRef.push({
+            name: roundName,
+            pointsPerQuestion: 1
+        });
         $("#addModal").modal("hide");
         editRound(null, round.key);
     }
@@ -332,7 +349,7 @@ function addRound(roundName) {
  */
 function editRoundName(e) {
     // todo: clean up this hot mess
-    if(e.target == $("#round-edit-form")[0]) {
+    if (e.target == $("#round-edit-form")[0]) {
         e.preventDefault();
     }
     var roundEdit = (e.target == $("#roundName")[0] || e.target == $("#round-edit-form")[0]);
@@ -342,15 +359,17 @@ function editRoundName(e) {
 
     console.log("roundEdit", roundEdit);
     console.log("target", e.target);
-        
+
     if (roundEdit && !newVal && e.target == $("#roundName")[0]) {
-        // kludge to get validation to show
+        // kludge to get validation to show      
+        console.log("validate");
+          
         $('<input type="submit">').hide().appendTo($("#round-edit-form")).click().remove();
-    }
-    else if (newVal && newVal !== oldVal) {
-        roundsRef.child("/" + roundID).update({ name: newVal });
-    }
-    else if(!roundEdit && !newVal) {
+    } else if (newVal && newVal !== oldVal) {
+        roundsRef.child("/" + roundID).update({
+            name: newVal
+        });
+    } else if (!roundEdit && !newVal) {
         e.target.html(oldVal);
     }
 }
@@ -455,7 +474,10 @@ function printRound() {
  */
 function addTeam(teamName) {
     if (teamRef && teamName.length) {
-        teamRef.push({ name: teamName, score: 0 });
+        teamRef.push({
+            name: teamName,
+            score: 0
+        });
         $("#addModal").modal("hide");
     }
 }
@@ -465,42 +487,122 @@ function addTeam(teamName) {
  * @param {object} e 
  */
 function editTeamName(e) {
-    var teamID = e.target.parents("tr").attr("id");
-    var val = e.value.trim();
+    // var teamID = e.target.parents("tr").attr("id");
+    // var val = e.value.trim();
 
-    if (val && val !== e.old_value) {
-        teamRef.child("/" + teamID).update({ name: val });
-    } else if(!val) {
-        e.target.html(e.old_value);
+    // if (val && val !== e.old_value) {
+    //     teamRef.child("/" + teamID).update({
+    //         name: val
+    //     });
+    // } else if (!val) {
+    //     e.target.html(e.old_value);
+    // }
+
+    // todo: clean up this hot mess
+    if (e.target == $("#team-edit-form")[0]) {
+        e.preventDefault();
+    }
+    var teamEdit = (e.target == $("#teamName")[0] || e.target == $("#team-edit-form")[0]);
+    var teamID = teamEdit ? currentTeamID : e.target.parents("tr").attr("id");
+    var newVal = teamEdit ? $("#teamName").val().trim() : e.value.trim();
+    var oldVal = teamEdit ? teams[teamID].name : e.old_value;
+
+    console.log("teamEdit", teamEdit);
+    console.log(e.target);
+    
+    
+    if (teamEdit && !newVal && e.target == $("#teamName")[0]) {
+        // kludge to get validation to show
+        console.log("validate");
+        
+        $('<input type="submit">').hide().appendTo($("#team-edit-form")).click().remove();
+    } else if (newVal && newVal !== oldVal) {
+        teamRef.child("/" + teamID).update({
+            name: newVal
+        });
+    } else if (!teamEdit && !newVal) {
+        e.target.html(oldVal);
     }
 }
 // Joellen works here
 /**
- * Edit round by either id or event target's data-id
+ * Edit team 
  * @param {object} e 
- * @param {string} id  
  */
-function editTeam(e, id) {
-    var roundScore = 0;
-    var totalScore = 0;
-    var teamID = teamName;
-    console.log(teamName);
-    // displaying totalScore into total-score
-    $("<tr>")
-    .append(
-        $("<td>").text(totalScore),
-    ).appendTo($("#total-score"));
+function editTeam(e) {
+    currentTeamID = $(this).attr("data-id");
+    var team = teams[currentTeamID];
+    if (!team) {
+        return;
+    }
+    $("#total-score").text(team.score);
+    $("#teamName").val(team.name);
+    updateTeams();
 
     $("#navigation-carousel").carousel(EDIT_TEAM);
-    // You need to grab the existing teamName and push it into the value field of the teamID form!
-    // dynamically add rows to your score-list table that are input forms for the user to add the score!
-        // okay so...there can be infinite rows of round scores to add, we need to create a function for adding the rounds scores together. Pretty sure this won't be a for loop, but it very well may be.  Look into arrow functions jic.
-    // when a score is input on score-list it needs to add to the existing integer of the table total-score!
-
 }
 
 function cancelEditTeam() {
     $("#navigation-carousel").carousel(MAIN);
+}
+
+function addRoundScore(e) {
+    e.preventDefault();
+    var roundScore = $("#round-score").val();
+    if (teamRef) {
+        teamRef.child("/" + currentTeamID + "/roundScores/").push(roundScore);
+        $("#round-score").val("");
+    }
+}
+
+function editScore(e) {
+    var scoreID = e.target.parents("tr").attr("id");
+    var val = parseInt(e.value.trim());
+    console.log(val);
+    
+    if (val && val !== e.old_value && !isNaN(val)) {
+        e.target.html(val);
+        teamRef.child("/" + currentTeamID + "/roundScores/" + scoreID).set(val);
+    } else if (!val || !isNaN(val)) {
+        e.target.html(e.old_value);
+    }
+}
+
+function updateTeams() {
+    var teamKey, team;
+
+    // loop over teams, calculate the score, store it locally
+    for (teamKey in teams) {
+        team = teams[teamKey];
+        
+        var totalScore = 0;
+        for (var scoreKey in team.roundScores) {
+            totalScore += parseInt(team.roundScores[scoreKey]);
+        }
+        teams[teamKey].score = totalScore;
+        $("#" + teamKey + " th:nth-of-type(1)").text(team.name);
+        $("#"+teamKey + " td:nth-of-type(1)").text(totalScore);
+    };
+
+    // if we're on the team edit screen, update the total score display, and the list of scores
+    if (currentTeamID) {
+        team = teams[currentTeamID];
+        if (team) {
+            $("#total-score").text(team.score);
+            
+            $("#score-list").empty();
+            for (var scoreKey in team.roundScores) {
+                $("<tr>").attr("id", scoreKey).attr("data-type", "score").append(
+                    $("<th>").attr("scope", "row").editable("click", editScore).text(team.roundScores[scoreKey]),
+                    $("<td>").append(deleteButton(scoreKey))
+                ).appendTo($("#score-list"));
+            }
+        }
+    }
+}
+
+function deleteScore() {
+    teamRef.child("/" + currentTeamID + "/roundScores/" + $(this).attr("data-id")).remove();
 }
 // Joellen stops working here
 
@@ -542,7 +644,11 @@ function addCustomQuestion(e) {
 function addQuestion(question, answer) {
     var round = rounds[currentRoundID];
     var order = round.questions ? (Object.keys(round.questions).length + 1) : 1;
-    roundsRef.child("/" + currentRoundID + "/questions").push({ question: question, answer: answer, order: order });
+    roundsRef.child("/" + currentRoundID + "/questions").push({
+        question: question,
+        answer: answer,
+        order: order
+    });
 }
 
 /**
@@ -572,8 +678,10 @@ function editQuestionTitle(e) {
     var val = e.value.trim();
 
     if (val && val !== e.old_value) {
-        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ question: val });
-    } else if(!val) {
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({
+            question: val
+        });
+    } else if (!val) {
         e.target.html(e.old_value);
     }
 }
@@ -587,8 +695,10 @@ function editQuestionAnswer(e) {
     var val = e.value.trim();
 
     if (val && val !== e.old_value) {
-        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({ answer: val });
-    } else if(!val) {
+        roundsRef.child("/" + currentRoundID + "/questions/" + questionID).update({
+            answer: val
+        });
+    } else if (!val) {
         e.target.html(e.old_value);
     }
 }
@@ -598,7 +708,9 @@ function editQuestionAnswer(e) {
  * @param {object} e 
  */
 function updatePointsPerQuestion(e) {
-    roundsRef.child("/" + currentRoundID).update({ pointsPerQuestion: $(this).val() });
+    roundsRef.child("/" + currentRoundID).update({
+        pointsPerQuestion: $(this).val()
+    });
 }
 
 /**

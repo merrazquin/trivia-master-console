@@ -231,10 +231,12 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-6">
-                                    <div class="form-group">
-                                        <label for="teamID">Team Name</label>
-                                        <input type="text" class="form-control" id="teamName" value="">
-                                    </div>
+                                    <form id="team-edit-form"></form>
+                                        <div class="form-group">
+                                            <label for="teamName">Team Name</label>
+                                            <input type="text" class="form-control" id="teamName" value="">
+                                        </div>
+                                    </form>
                                 </div>
                                 <div class="col-2">
                                     <table class="table table-sm loaded">
@@ -243,12 +245,24 @@
                                                 <th scope="col" class="text-center" id="totalScore">Total Score</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="total-score">
+                                        <tbody>
+                                            <tr><td id="total-score"></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                            <button class="btn btn-default input-score">Input Round Score</button>
+                            <form id="round-score-form">
+                                <div class="form-row">
+                                    <div class="col-auto">
+                                        <div class="input-group">
+                                            <input id="round-score" type="number" class="form-control" placeholder="Score" required>
+                                            <span class="input-group-btn">
+                                            <button class="btn btn-secondary" type="submit">Input Round Score</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="row">
                                 <div class="col-6">
                                     <div class="card-body table-responsive">
