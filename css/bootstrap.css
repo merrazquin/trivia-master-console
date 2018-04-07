@@ -10,7 +10,7 @@
   --purple: #6f42c1;
   --pink: #e83e8c;
   --red: #dc3545;
-  --orange: #fd7e14;
+  --orange: #B24F00;
   --yellow: #ffc107;
   --green: #28a745;
   --teal: #20c997;
@@ -7594,6 +7594,35 @@ body .ui-tooltip {
     -webkit-transform: scale(1);
     transform: scale(1); } }
 
+body {
+  background-color: #adb5bd; }
+
+.jumbotron {
+  background: #CC5B03;
+  color: #FF9C50;
+  margin: 50px;
+  border: 1px solid #FF9C50; }
+
+.btn {
+  color: #fff;
+  background: #FF9C50;
+  margin-left: 5px;
+  border: 1px solid #FF7103; }
+
+.btn:hover {
+  color: #fff;
+  background: #FF9C50;
+  border: 1px solid #FF9C50; }
+
+#logout {
+  color: #FF9C50;
+  background: #CC5B03; }
+
+#logout:hover {
+  color: #17a2b8;
+  background: #FF9C50;
+  border: 1px solid #FF7103; }
+
 .card {
   margin-bottom: 1.2rem; }
 
@@ -7630,6 +7659,7 @@ tbody th {
   border: 1px solid #000; }
 
 .octicon {
+  color: #CC5B03;
   padding-left: 4px; }
 
 /* firebase loading */
