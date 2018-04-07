@@ -791,6 +791,15 @@ $(document).keyup(function (event) {
     if (isDashboard && event.target == $("body")[0] && event.keyCode == 27) {
         $("#navigation-carousel").carousel(MAIN);
     }
+
+    if(isRunningRound) {
+        if(event.keyCode == 37) {
+            $("#display-carousel").carousel("prev");
+        }
+        if(event.keyCode == 39) {
+            $("#display-carousel").carousel("next");
+        }
+    }
 });
 
 if ($("#questions-list").length) {
