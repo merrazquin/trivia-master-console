@@ -163,11 +163,11 @@ function createSortedTeamsArray(teamsObj) {
     var teams = [];
     for (var key in teamsObj) {
         var team = teamsObj[key];
-
         var score = 0;
         for (var scoreKey in team.roundScores) {
             score += parseInt(team.roundScores[scoreKey]);
         }
+        team.id = key;
         team.score = score;
         teams.push(team);
     }
@@ -200,28 +200,10 @@ function onAuth(user) {
         }
     }, handleDatabaseError);
 
-    // when a team is added to the DB, add it to the display
-    teamRef.on("child_added", function (childSnap) {
-        var child = childSnap.val();
-
-        $("<tr>")
-            .attr("id", childSnap.key)
-            .attr("data-type", "team")
-            .append(
-                $("<th>").attr("scope", "row").text(child.name).editable("click", editTeamName),
-                $("<td>").text(child.score),
-                $("<td>").append(editButton(childSnap.key, "edit-team")),
-                $("<td>").append(deleteButton(childSnap.key))
-            ).appendTo($("#team-list"));
-    }, handleDatabaseError);
-
-    // when a team is removed from the DB, remove it from the display
-    teamRef.on("child_removed", function (childSnap) {
-        $("#" + childSnap.key).remove();
-    }, handleDatabaseError);
-
+    // when the teams are updated, update the team list
     teamRef.on("value", function (teamSnap) {
         teams = teamSnap.val();
+
         updateTeams();
     }, handleDatabaseError);
 
@@ -369,7 +351,7 @@ function addRound(roundName) {
             pointsPerQuestion: 1
         });
         $("#addModal").modal("hide");
-        setTimeout(function() {
+        setTimeout(function () {
             editRound(null, round.key);
         }, 500);
     }
@@ -637,18 +619,19 @@ function editScore(e) {
 function updateTeams() {
     var teamKey, team;
 
-    // loop over teams, calculate the score, store it locally
-    for (teamKey in teams) {
-        team = teams[teamKey];
-
-        var totalScore = 0;
-        for (var scoreKey in team.roundScores) {
-            totalScore += parseInt(team.roundScores[scoreKey]);
-        }
-        teams[teamKey].score = totalScore;
-        $("#" + teamKey + " th:nth-of-type(1)").text(team.name);
-        $("#" + teamKey + " td:nth-of-type(1)").text(totalScore);
-    };
+    $("#team-list").empty();
+    var teamsArr = createSortedTeamsArray(teams);
+    teamsArr.forEach(team => {
+        $("<tr>")
+            .attr("id", team.id)
+            .attr("data-type", "team")
+            .append(
+                $("<th>").attr("scope", "row").text(team.name).editable("click", editTeamName),
+                $("<td>").text(team.score),
+                $("<td>").append(editButton(team.id, "edit-team")),
+                $("<td>").append(deleteButton(team.id))
+            ).appendTo($("#team-list"));
+    });
 
     // if we're on the team edit screen, update the total score display, and the list of scores
     if (currentTeamID) {
@@ -792,9 +775,9 @@ function deleteQuestion() {
 
 //#region Event Handlers
 
-$(document).keyup(function(event) {
+$(document).keyup(function (event) {
     // if we're on the dashboard, the user hit escape, and they're not inside a textfield, go back to main view
-    if(isDashboard &&  event.target == $("body")[0] && event.keyCode == 27) {
+    if (isDashboard && event.target == $("body")[0] && event.keyCode == 27) {
         $("#navigation-carousel").carousel(MAIN);
     }
 });
