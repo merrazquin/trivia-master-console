@@ -7,13 +7,81 @@
     <title>Trivia Master Console - Run Round</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css" />
+
+    <style>
+        /* html, body {
+            height: 100%
+        }
+        body {
+            display: flex;
+            align-items: center;
+        } */
+
+        #navigation-carousel {
+            margin-top: 30%;
+        }
+
+        #navigation-carou
+
+        #leaderboard {
+            counter-reset: leader;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .leaderboard-item:nth-of-type(1) {
+            color:green;
+            font-size: 1.5rem;
+        }
+        .leaderboard-item:nth-of-type(2) {
+            color:yellow; 
+            font-size: 1.25rem;
+        }
+        .leaderboard-item:nth-of-type(3) {
+            color:red;
+        }
+
+        .leaderboard-item::before {
+            counter-increment: leader;
+            content: counter(leader) ". ";
+            margin-right: 10px;
+        }
+
+
+        .middle {
+            border-bottom: 1px dotted;
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-info">
     <div class="container text-center">
-        <h1>Run Round</h1>
+        <div id="navigation-carousel" class="carousel slide" data-keyboard="false" data-wrap="false" data-interval="false">
+            <div class="carousel-inner" id="round-carousel">
+                <div class="carousel-item active">
+                    <div class="sk-three-bounce loading">
+                        <div class="sk-child sk-bounce1"></div>
+                        <div class="sk-child sk-bounce2"></div>
+                        <div class="sk-child sk-bounce3"></div>
+                    </div>
+                    <div class="loaded">
+                        <div class="jumbotron">
+                            <h1></h1>
+                        </div>
+                        <h2 class="leaderboard-exists">Leaderboard:</h2>
+                        <div class="row">
+                            <ol id="leaderboard" class="col-8 m-auto"></ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
@@ -26,6 +94,12 @@
     <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script src="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.js"></script>
     <script src="scripts/main.js"></script>
+
+    <script>
+        $(function () {
+            // runRound(getUrlParameter("id"))
+        });
+    </script>
 </body>
 
 </html>

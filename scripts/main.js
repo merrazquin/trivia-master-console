@@ -13,6 +13,7 @@ var database,
     roundsRef,
     currentRoundID,
     sessionToken,
+    runningRound,
     sessionResetCount = 0,
     sessionResetMax = 1;
 
@@ -31,35 +32,47 @@ firebase.initializeApp(config);
 database = firebase.database();
 
 $(function () {
+    var isDashboard = location.href.indexOf("dashboard.html") != -1;
+    var isRunningRound = location.href.indexOf("run-round.html") != -1;
     // on document ready, if we're on the dashboard page initialize the app
-    if (location.href.indexOf("dashboard.html") != -1) {
+    if (isDashboard || isRunningRound) {
         firebase.auth().onAuthStateChanged(function (user) {
+            // User is signed in.
             if (user) {
-                // User is signed in.
-                onAuth(user);
+                uid = user.uid;
+                userRef = database.ref("/users/" + uid);
+                teamRef = database.ref("/users/" + uid + "/teams");
+                roundsRef = database.ref("/users/" + uid + "/rounds");
 
-                $(document)
-                    .on("submit", "#add-api-question-form", pullAPIQuestions)
-                    .on("submit", ".modal form", addEntity)
-                    .on("submit", "#add-custom-question-form", addCustomQuestion)
-                    .on("submit", "#round-edit-form", editRoundName)
-                    .on("submit", "#team-edit-form", editTeamName)
-                    .on("submit", "#round-score-form", addRoundScore)
-                    .on("click", ".edit-round", editRound)
-                    .on("click", ".delete-round", deleteRound)
-                    .on("click", ".run-round", runRound)
-                    .on("click", ".print-round", printRound)
-                    .on("click", ".edit-team", editTeam)
-                    .on("click", ".delete-team", deleteTeam)
-                    .on("click", ".delete-score", deleteScore)
-                    .on("click", ".cancel-round-edit", cancelRoundEdit)
-                    .on("click", ".cancel-team-edit", cancelEditTeam)
-                    .on("click", "#add-custom-question-submit", addCustomQuestion)
-                    .on("click", ".delete-question", deleteQuestion)
-                    .on("click", ".question-scroll", scrollToQuestionCreation)
-                    .on("input", "#ppq", updatePointsPerQuestion)
-                    .on("input", "#roundName", editRoundName)
-                    .on("input", "#teamName", editTeamName);
+                if (isRunningRound) {
+                    runRound(getUrlParameter("id"));
+                }
+
+                if (isDashboard) {
+                    onAuth(user);
+                    $(document)
+                        .on("submit", "#add-api-question-form", pullAPIQuestions)
+                        .on("submit", ".modal form", addEntity)
+                        .on("submit", "#add-custom-question-form", addCustomQuestion)
+                        .on("submit", "#round-edit-form", editRoundName)
+                        .on("submit", "#team-edit-form", editTeamName)
+                        .on("submit", "#round-score-form", addRoundScore)
+                        .on("click", ".edit-round", editRound)
+                        .on("click", ".delete-round", deleteRound)
+                        .on("click", ".run-round", launchRound)
+                        .on("click", ".print-round", printRound)
+                        .on("click", ".edit-team", editTeam)
+                        .on("click", ".delete-team", deleteTeam)
+                        .on("click", ".delete-score", deleteScore)
+                        .on("click", ".cancel-round-edit", cancelRoundEdit)
+                        .on("click", ".cancel-team-edit", cancelEditTeam)
+                        .on("click", "#add-custom-question-submit", addCustomQuestion)
+                        .on("click", ".delete-question", deleteQuestion)
+                        .on("click", ".question-scroll", scrollToQuestionCreation)
+                        .on("input", "#ppq", updatePointsPerQuestion)
+                        .on("input", "#roundName", editRoundName)
+                        .on("input", "#teamName", editTeamName);
+                }
             } else {
                 // User is signed out, redirect to login page
                 window.location.replace("index.html");
@@ -141,6 +154,29 @@ function gatherQuestions(questionsObj) {
 
     return questions;
 }
+
+/**
+ * Returns teams object as an array sorted by score
+ * @param {object} teamsObj 
+ */
+function createSortedTeamsArray(teamsObj) {
+    var teams = [];
+    for (var key in teamsObj) {
+        var team = teamsObj[key];
+
+        var score = 0;
+        for (var scoreKey in team.roundScores) {
+            score += parseInt(team.roundScores[scoreKey]);
+        }
+        team.score = score;
+        teams.push(team);
+    }
+
+    // order by score, descending
+    teams.sort((a, b) => b.score - a.score);
+
+    return teams;
+}
 //#endregion
 
 //#region DB Functions
@@ -149,14 +185,8 @@ function gatherQuestions(questionsObj) {
  * @param {object} user 
  */
 function onAuth(user) {
-    uid = user.uid;
-
     var email = user.email ? (" (" + user.email + ")") : "";
     $("#user-info").text(user.displayName + email);
-
-    userRef = database.ref("/users/" + uid);
-    teamRef = database.ref("/users/" + uid + "/teams");
-    roundsRef = database.ref("/users/" + uid + "/rounds");
 
     userRef.on("value", function (snap) {
         // once user info has been pulled, hide loading divs
@@ -360,7 +390,7 @@ function editRoundName(e) {
     if (roundEdit && !newVal && e.target == $("#roundName")[0]) {
         // kludge to get validation to show      
         console.log("validate");
-          
+
         $('<input type="submit">').hide().appendTo($("#round-edit-form")).click().remove();
     } else if (newVal && newVal !== oldVal) {
         roundsRef.child("/" + roundID).update({
@@ -433,8 +463,66 @@ function deleteRound() {
 /**
  * Launch the "slideshow" for the round
  */
-function runRound() {
+function launchRound() {
     window.location.href = "run-round.html?id=" + $(this).attr("data-id");
+}
+
+function runRound(id) {
+
+    var carousel = $("#round-carousel");
+    $(".carousel-item").not(":nth-of-type(1)").remove();//.empty();
+    userRef.on("value", function (snapshot) {
+        // once user info has been pulled, hide loading divs
+        $(".loaded").show();
+        $(".loading").hide();
+
+        console.log(snapshot)
+
+        if (snapshot.child("rounds").exists()) {
+            runningRound = snapshot.val().rounds[id];
+            var teams = createSortedTeamsArray(snapshot.val().teams);
+            // populate carousel with a title, leaderboard (if scores exist), questions, and an outro card
+
+            // title
+            $(".carousel-item:nth-of-type(1)").find("h1").text(runningRound.name);
+
+            // leaderboard
+            if (teams.length) {
+
+                teams.forEach(team => {
+                    $("<li>")
+                        .addClass("leaderboard-item")
+                        .append(
+                            $("<span>").text(team.name),
+                            $("<span>").addClass("middle"),
+                            $("<span>").text(team.score)
+                        )
+                        .appendTo($("#leaderboard"));
+
+                });
+            } else { $(".leaderboard-exists").hide(); }
+
+            // questions
+            var questions = gatherQuestions(runningRound.questions);
+
+            questions.forEach(question => {
+                $("<div>")
+                    .addClass("carousel-item")
+                    .append(
+                        $("<h1>").html(question.question)
+                    ).appendTo("#round-carousel");
+            });
+
+            $("<div>")
+                .addClass("carousel-item")
+                .append(
+                    $("<h1>").text("Please turn in your answer sheets")
+                ).appendTo("#round-carousel");
+
+
+        }
+    }, handleDatabaseError);
+
 }
 
 /**
@@ -528,7 +616,7 @@ function cancelEditTeam() {
 
 function addRoundScore(e) {
     e.preventDefault();
-    var roundScore = $("#round-score").val();
+    var roundScore = parseInt($("#round-score").val().trim());
     if (teamRef) {
         teamRef.child("/" + currentTeamID + "/roundScores/").push(roundScore);
         $("#round-score").val("");
@@ -539,7 +627,7 @@ function editScore(e) {
     var scoreID = e.target.parents("tr").attr("id");
     var val = parseInt(e.value.trim());
     console.log(val);
-    
+
     if (val && val !== e.old_value && !isNaN(val)) {
         e.target.html(val);
         teamRef.child("/" + currentTeamID + "/roundScores/" + scoreID).set(val);
@@ -554,14 +642,14 @@ function updateTeams() {
     // loop over teams, calculate the score, store it locally
     for (teamKey in teams) {
         team = teams[teamKey];
-        
+
         var totalScore = 0;
         for (var scoreKey in team.roundScores) {
             totalScore += parseInt(team.roundScores[scoreKey]);
         }
         teams[teamKey].score = totalScore;
         $("#" + teamKey + " th:nth-of-type(1)").text(team.name);
-        $("#"+teamKey + " td:nth-of-type(1)").text(totalScore);
+        $("#" + teamKey + " td:nth-of-type(1)").text(totalScore);
     };
 
     // if we're on the team edit screen, update the total score display, and the list of scores
@@ -569,7 +657,7 @@ function updateTeams() {
         team = teams[currentTeamID];
         if (team) {
             $("#total-score").text(team.score);
-            
+
             $("#score-list").empty();
             for (var scoreKey in team.roundScores) {
                 $("<tr>").attr("id", scoreKey).attr("data-type", "score").append(
