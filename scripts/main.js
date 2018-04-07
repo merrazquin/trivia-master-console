@@ -638,7 +638,7 @@ function updateTeams() {
             .attr("data-type", "team")
             .append(
                 $("<th>").attr("scope", "row").text(team.name).editable("click", editTeamName),
-                $("<td>").text(team.score),
+                $("<td>").addClass("text-right").text(team.score),
                 $("<td>").append(editButton(team.id, "edit-team")),
                 $("<td>").append(deleteButton(team.id))
             ).appendTo($("#team-list"));
