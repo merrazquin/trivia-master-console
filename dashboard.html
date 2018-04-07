@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizCommand - Dashboard</title>
+    <title>QuizCOMMAND - Dashboard</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css" />
 </head>
 
 <body>
-    <!-- Header -->
+    <!-- #region Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -25,14 +25,14 @@
             <a class="btn btn-primary btn-sm" href="#" role="button" id="logout">Log out</a>
         </div>
     </nav>
-    <!-- End Header -->
+    <!-- #endregion Header -->
 
     <div class="jumbotron text-center">
         <h1 class="logo"><span>Quiz</span><span>Command</span></h1>
         <h3>dashboard</h3>
     </div>
 
-    <!-- Game Functionality Options Begin -->
+    <!-- #region Dashboard content -->
     <div class="container">
         <div id="navigation-carousel" class="carousel slide" data-keyboard="false" data-wrap="false" data-interval="false">
             <div class="carousel-inner">
@@ -148,7 +148,6 @@
                 </div>
                 <div class="carousel-item active">
                     <div class="row">
-                        <!-- ROUNDS -->
                         <div id="rounds-card" class="col-lg-8">
                             <!-- #region Rounds main -->
                             <div class="card text-white bg-main default-view">
@@ -198,7 +197,6 @@
                                     </div>
                                 </div>
                                 <div class="card-body table-responsive">
-                                    <!-- fancy loading bubbles -->
                                     <div class="sk-three-bounce loading">
                                         <div class="sk-child sk-bounce1"></div>
                                         <div class="sk-child sk-bounce2"></div>
@@ -248,7 +246,7 @@
                                     <table class="table table-sm loaded">
                                         <thead>
                                             <tr>
-                                                <th scope="col" class="text-left plain" id="totalScore">Total Score</th>
+                                                <th scope="col" class="text-left plain">Total Score</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -289,7 +287,7 @@
             </div>
         </div>
     </div>
-    <!-- Game Functionality ENDS -->
+    <!-- #endregion Dashboard content -->
 
     <!-- #region MODALS -->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -374,9 +372,7 @@
                         <th>Answer</th>
                     </tr>
                 </thead>
-                <tbody>
-
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -388,13 +384,12 @@
         crossorigin="anonymous"></script>
     <script src="scripts/jquery.editable.min.js"></script>
     <script src="scripts/jquery.ui.touch-punch.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-
-
+    
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 

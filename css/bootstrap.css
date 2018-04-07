@@ -27,6 +27,7 @@
   --light: #f8f9fa;
   --dark: #343a40;
   --main: #31353D;
+  --accent: #92CDCF;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
@@ -1176,6 +1177,17 @@ pre {
   .table-hover .table-main:hover > th {
     background-color: #b8b9bd; }
 
+.table-accent,
+.table-accent > th,
+.table-accent > td {
+  background-color: #e0f1f2; }
+
+.table-hover .table-accent:hover {
+  background-color: #cee9ea; }
+  .table-hover .table-accent:hover > td,
+  .table-hover .table-accent:hover > th {
+    background-color: #cee9ea; }
+
 .table-active,
 .table-active > th,
 .table-active > td {
@@ -1863,6 +1875,29 @@ fieldset:disabled a.btn {
     .show > .btn-main.dropdown-toggle:focus {
       box-shadow: 0 0 0 0.2rem rgba(49, 53, 61, 0.5); }
 
+.btn-accent {
+  color: #212529;
+  background-color: #92CDCF;
+  border-color: #92CDCF; }
+  .btn-accent:hover {
+    color: #212529;
+    background-color: #77c1c3;
+    border-color: #6fbdbf; }
+  .btn-accent:focus, .btn-accent.focus {
+    box-shadow: 0 0 0 0.2rem rgba(146, 205, 207, 0.5); }
+  .btn-accent.disabled, .btn-accent:disabled {
+    color: #212529;
+    background-color: #92CDCF;
+    border-color: #92CDCF; }
+  .btn-accent:not(:disabled):not(.disabled):active, .btn-accent:not(:disabled):not(.disabled).active,
+  .show > .btn-accent.dropdown-toggle {
+    color: #212529;
+    background-color: #6fbdbf;
+    border-color: #66b9bc; }
+    .btn-accent:not(:disabled):not(.disabled):active:focus, .btn-accent:not(:disabled):not(.disabled).active:focus,
+    .show > .btn-accent.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0.2rem rgba(146, 205, 207, 0.5); }
+
 .btn-outline-primary {
   color: #445878;
   background-color: transparent;
@@ -2069,6 +2104,29 @@ fieldset:disabled a.btn {
     .btn-outline-main:not(:disabled):not(.disabled):active:focus, .btn-outline-main:not(:disabled):not(.disabled).active:focus,
     .show > .btn-outline-main.dropdown-toggle:focus {
       box-shadow: 0 0 0 0.2rem rgba(49, 53, 61, 0.5); }
+
+.btn-outline-accent {
+  color: #92CDCF;
+  background-color: transparent;
+  background-image: none;
+  border-color: #92CDCF; }
+  .btn-outline-accent:hover {
+    color: #212529;
+    background-color: #92CDCF;
+    border-color: #92CDCF; }
+  .btn-outline-accent:focus, .btn-outline-accent.focus {
+    box-shadow: 0 0 0 0.2rem rgba(146, 205, 207, 0.5); }
+  .btn-outline-accent.disabled, .btn-outline-accent:disabled {
+    color: #92CDCF;
+    background-color: transparent; }
+  .btn-outline-accent:not(:disabled):not(.disabled):active, .btn-outline-accent:not(:disabled):not(.disabled).active,
+  .show > .btn-outline-accent.dropdown-toggle {
+    color: #212529;
+    background-color: #92CDCF;
+    border-color: #92CDCF; }
+    .btn-outline-accent:not(:disabled):not(.disabled):active:focus, .btn-outline-accent:not(:disabled):not(.disabled).active:focus,
+    .show > .btn-outline-accent.dropdown-toggle:focus {
+      box-shadow: 0 0 0 0.2rem rgba(146, 205, 207, 0.5); }
 
 .btn-link {
   font-weight: 400;
@@ -3381,6 +3439,14 @@ tbody.collapse.show {
     text-decoration: none;
     background-color: #1a1c21; }
 
+.badge-accent {
+  color: #212529;
+  background-color: #92CDCF; }
+  .badge-accent[href]:hover, .badge-accent[href]:focus {
+    color: #212529;
+    text-decoration: none;
+    background-color: #6fbdbf; }
+
 .jumbotron {
   padding: 2rem 1rem;
   margin-bottom: 2rem;
@@ -3497,6 +3563,15 @@ tbody.collapse.show {
     border-top-color: #b8b9bd; }
   .alert-main .alert-link {
     color: #030303; }
+
+.alert-accent {
+  color: #4c6b6c;
+  background-color: #e9f5f5;
+  border-color: #e0f1f2; }
+  .alert-accent hr {
+    border-top-color: #cee9ea; }
+  .alert-accent .alert-link {
+    color: #374d4e; }
 
 @-webkit-keyframes progress-bar-stripes {
   from {
@@ -3695,6 +3770,17 @@ tbody.collapse.show {
     color: #fff;
     background-color: #191c20;
     border-color: #191c20; }
+
+.list-group-item-accent {
+  color: #4c6b6c;
+  background-color: #e0f1f2; }
+  .list-group-item-accent.list-group-item-action:hover, .list-group-item-accent.list-group-item-action:focus {
+    color: #4c6b6c;
+    background-color: #cee9ea; }
+  .list-group-item-accent.list-group-item-action.active {
+    color: #fff;
+    background-color: #4c6b6c;
+    border-color: #4c6b6c; }
 
 .close {
   float: right;
@@ -4283,6 +4369,14 @@ button.bg-main:hover,
 button.bg-main:focus {
   background-color: #1a1c21 !important; }
 
+.bg-accent {
+  background-color: #92CDCF !important; }
+
+a.bg-accent:hover, a.bg-accent:focus,
+button.bg-accent:hover,
+button.bg-accent:focus {
+  background-color: #6fbdbf !important; }
+
 .bg-white {
   background-color: #fff !important; }
 
@@ -4345,6 +4439,9 @@ button.bg-main:focus {
 
 .border-main {
   border-color: #31353D !important; }
+
+.border-accent {
+  border-color: #92CDCF !important; }
 
 .border-white {
   border-color: #fff !important; }
@@ -6110,6 +6207,12 @@ a.text-dark:hover, a.text-dark:focus {
 a.text-main:hover, a.text-main:focus {
   color: #1a1c21 !important; }
 
+.text-accent {
+  color: #92CDCF !important; }
+
+a.text-accent:hover, a.text-accent:focus {
+  color: #6fbdbf !important; }
+
 .text-muted {
   color: #6c757d !important; }
 
@@ -7708,9 +7811,9 @@ body {
   text-transform: uppercase; }
 
 .vertical-center {
-  min-height: 100%;
+  min-height: 90%;
   /* Fallback for browsers do NOT support vh unit */
-  min-height: 100vh;
+  min-height: 90vh;
   /* These two lines are counted as one :-)       */
   display: flex;
   align-items: center; }
@@ -7718,7 +7821,6 @@ body {
 .card {
   margin-bottom: 1.2rem; }
 
-/* #region Round display */
 #leaderboard {
   counter-reset: leader; }
 
@@ -7749,13 +7851,13 @@ body {
   margin: 0 5px; }
 
 #display-carousel {
-  min-height: 90vh; }
+  min-height: 85vh; }
   #display-carousel .carousel-item .intro > * {
     width: 100%; }
   #display-carousel .carousel-item .intro,
   #display-carousel .carousel-item > h1 {
     display: flex;
-    height: 90vh;
+    height: 85vh;
     justify-content: center;
     align-items: center;
     text-align: center; }
@@ -7766,16 +7868,16 @@ body {
   #display-carousel .active.carousel-item-right,
   #display-carousel .carousel-item-prev,
   #display-carousel .active.carousel-item-left {
-    min-height: 90vh; }
+    min-height: 85vh; }
 
 /* #endregion */
-th#totalScore {
+th.plain {
   border: 0px; }
 
 tbody th {
   cursor: pointer; }
 
-.edit-view, .loaded, .option {
+.edit-view, .loaded, .option, #question-indicator {
   display: none; }
 
 #round-print, #round-print * {

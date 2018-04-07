@@ -1,3 +1,4 @@
+// #region vars
 var EDIT_ROUND = 0,
     MAIN = 1,
     EDIT_TEAM = 2;
@@ -18,8 +19,9 @@ var database,
     isRunningRound,
     sessionResetCount = 0,
     sessionResetMax = 1;
+// #endregion
 
-// Initialize Firebase
+// #region Initialize Firebase
 config = {
     apiKey: "AIzaSyC4uRR38L_nrqTz0CR636MT3tsq7J4E8XA",
     authDomain: "trivia-master-console.firebaseapp.com",
@@ -30,11 +32,22 @@ config = {
 };
 firebase.initializeApp(config);
 database = firebase.database();
+// #endregion
 
+// on ready, initialize the app
 $(function () {
+    /**
+     * When logout button is clicked, log user out
+     */
+    $("#logout").click(() => {
+        firebase.auth().signOut();
+    });
+
+    // Are we in the dashboard or running a round?
     isDashboard = location.href.indexOf("dashboard.html") != -1;
     isRunningRound = location.href.indexOf("run-round.html") != -1;
-    // on document ready, if we're on the dashboard page initialize the app
+
+    // on document ready, if we're either on the dashboard page or running a round, initialize the app
     if (isDashboard || isRunningRound) {
         firebase.auth().onAuthStateChanged(function (user) {
             // User is signed in.
@@ -50,6 +63,8 @@ $(function () {
 
                 if (isDashboard) {
                     onAuth(user);
+
+                    // user input handlers
                     $(document)
                         .on("submit", "#add-api-question-form", pullAPIQuestions)
                         .on("submit", ".modal form", addEntity)
@@ -83,20 +98,9 @@ $(function () {
     }
 });
 
-/**
- * When logout button is clicked, log user out and redirect to login screen
- */
-$("#logout").click(() => {
-    firebase.auth().signOut().then(function () {
-        window.location.replace("index.html");
-    }, function (error) {
-        console.error('Sign Out Error', error);
-    });
-});
-
 //#region Helper Functions
 /**
- * For any database erro, log error code to the console
+ * For any database error, log error code to the console
  * @param {object} error 
  */
 function handleDatabaseError(error) {
@@ -140,7 +144,7 @@ function fixWidthHelper(e, ui) {
 }
 
 /**
- * Returns questions object as an array includes the key in the id property
+ * Returns questions object as an array, includes the key in the id property, and sorts it by order
  * @param {object} questionsObj 
  */
 function gatherQuestions(questionsObj) {
@@ -185,6 +189,7 @@ function createSortedTeamsArray(teamsObj) {
  * @param {object} user 
  */
 function onAuth(user) {
+    //if the user's email is available to us, display it
     var email = user.email ? (" (" + user.email + ")") : "";
     $("#user-info").text(user.displayName + email);
 
@@ -193,14 +198,14 @@ function onAuth(user) {
         $(".loaded").show();
         $(".loading").hide();
 
-        // find user's session token
+        // find user's session token; if it doesn't exist, retrieve a new one
         sessionToken = snap.val().sessionToken
         if (!sessionToken) {
             retrieveSessionToken();
         }
     }, handleDatabaseError);
 
-    // when the teams are updated, update the team list
+    // when the teams are updated, update the UI
     teamRef.on("value", function (teamSnap) {
         teams = teamSnap.val();
 
@@ -208,7 +213,7 @@ function onAuth(user) {
     }, handleDatabaseError);
 
 
-    // when the rounds are updated, update the question list
+    // when the rounds are updated, update the UI
     roundsRef.on("value", function (roundsSnap) {
         rounds = roundsSnap.val();
 
@@ -322,7 +327,11 @@ function printButton(id, customClass) {
 //#endregion
 
 //#region Main functionality
-
+/**
+ * Adds an entity of whichever type is specified by the role of the form
+ * Supported types: team, round
+ * @param {object} e 
+ */
 function addEntity(e) {
     e.preventDefault();
     var type = $(e.target).attr("role");
@@ -362,7 +371,6 @@ function addRound(roundName) {
  * @param {object} e 
  */
 function editRoundName(e) {
-    // todo: clean up this hot mess
     if (e.target == $("#round-edit-form")[0]) {
         e.preventDefault();
     }
@@ -373,8 +381,6 @@ function editRoundName(e) {
 
     if (roundEdit && !newVal && e.target == $("#roundName")[0]) {
         // kludge to get validation to show      
-        console.log("validate");
-
         $('<input type="submit">').hide().appendTo($("#round-edit-form")).click().remove();
     } else if (newVal && newVal !== oldVal) {
         roundsRef.child("/" + roundID).update({
@@ -452,9 +458,12 @@ function launchRound() {
 }
 
 function runRound(id) {
-
     var carousel = $("#round-carousel");
-    $(".carousel-item").not(":nth-of-type(1)").remove();//.empty();
+
+    // remove all carousel items except the intro (first item)
+    $(".carousel-item").not(":nth-of-type(1)").remove();
+
+
     userRef.on("value", function (snapshot) {
         // once user info has been pulled, hide loading divs
         $(".loaded").show();
@@ -467,6 +476,7 @@ function runRound(id) {
 
             // title
             $(".carousel-item:nth-of-type(1)").find("h1").text(runningRound.name);
+            $("#ppq").text(runningRound.pointsPerQuestion + " point" + (runningRound.pointsPerQuestion != 1 ? "s" : ""));
             $("#leaderboard").empty();
             // leaderboard
             if (teams.length) {
@@ -492,14 +502,15 @@ function runRound(id) {
                     .addClass("carousel-item")
                     .append(
                         $("<h1>").html(question.question)
-                    ).appendTo("#round-carousel");
+                    ).appendTo(carousel);
             });
 
+            // last page
             $("<div>")
                 .addClass("carousel-item")
                 .append(
                     $("<h1>").text("Please turn in your answer sheets")
-                ).appendTo("#round-carousel");
+                ).appendTo(carousel);
 
 
         }
@@ -758,7 +769,7 @@ function editQuestionAnswer(e) {
  */
 function updatePointsPerQuestion(e) {
     roundsRef.child("/" + currentRoundID).update({
-        pointsPerQuestion: $(this).val()
+        pointsPerQuestion: parseInt($(this).val().trim())
     });
 }
 
@@ -848,8 +859,32 @@ $("#addModal").on("shown.bs.modal", function (event) {
 $("#addModal").on("hidden.bs.modal", function (event) {
     $(this).find("form").trigger("reset");
 });
+
+/**
+ * When the round display carousel has slid, update the question indicator
+ */
+$("#display-carousel").on("slid.bs.carousel", function(event) {
+    if(event.to > 0 && event.to < $(".carousel-item").length - 1) {
+        $("#question-indicator").find("span").text(event.to + " / " + ($(".carousel-item").length - 2));        
+        $("#question-indicator").show();
+    } else {
+        $("#question-indicator").hide();
+    }
+});
 //#endregion
 
+//#region Trivia API interaction
+/**
+ * populate the categories drop down
+ */
+$.getJSON("https://opentdb.com/api_category.php", function(result){
+    result.trivia_categories.forEach(category => {
+        $("<option>")
+            .attr("value", category.id)
+            .html(category.name)
+            .appendTo("#category");
+    });
+});
 
 /**
  * Queries API using given apiOptions, and passes the data back to teh callback
@@ -888,32 +923,21 @@ function pullQuestion(apiOptions, callback) {
     });
 }
 
+/**
+ * Adds questions returned from API call
+ * @param {object} results 
+ */
 function handleAPIResponse(results) {
     results.forEach(questionObj => {
         addQuestion(questionObj.question, questionObj.correct_answer);
     });
 }
-//I recommend the next step involve binding this function to inputs from the UI HTML, and binding the output to the appropriate area in the UI HTML
-//$("div").append(field + " ");
-
-//#region roundCreation
-var queryURL = "https://opentdb.com/api_category.php";
 
 /**
- * populate the categories drop down
+ * Retrieve a session token, and subsequently make a call to the API if necessary
+ * @param {function} callback 
+ * @param {any} callbackParams 
  */
-$.ajax({
-    url: queryURL,
-    method: 'GET'
-}).then(function (response) {
-    var categories = "";
-    for (i = 0; i < response.trivia_categories.length; i++) {
-        categories = categories + "<option value=" + response.trivia_categories[i].id + "> " + response.trivia_categories[i].name + "</option>";
-    }
-    $("#category").append(categories);
-
-});
-
 function retrieveSessionToken(callback, callbackParams) {
     $.getJSON("https://opentdb.com/api_token.php?command=request", createCallback(callback, callbackParams), function (error) {
         //todo: handle error
@@ -921,6 +945,11 @@ function retrieveSessionToken(callback, callbackParams) {
     });
 }
 
+/**
+ * Reset a session token, and subsequently make a call to the API if necessary
+ * @param {function} callback 
+ * @param {any} callbackParams 
+ */
 function resetSessionToken(callback, callbackParams) {
     $.getJSON("https://opentdb.com/api_token.php?command=reset&token=" + sessionToken, createCallback(callback, callbackParams), function (error) {
         // todo: handle error
@@ -928,12 +957,24 @@ function resetSessionToken(callback, callbackParams) {
     })
 }
 
+/**
+ * Closure for passing along callback & params
+ * @param {function} subCallback 
+ * @param {any} params 
+ */
 function createCallback(subCallback, params) {
     return function (data) {
         setSessionToken(data, subCallback, params);
     };
 }
 
+/**
+ * When token is received from API, store it locally and in DB
+ * If the app was mid-call when the token was requested/reset, re-create the call
+ * @param {object} result 
+ * @param {function} callback 
+ * @param {any} params 
+ */
 function setSessionToken(result, callback, params) {
     if (sessionToken != result.token) {
         sessionResetCount = 0;
