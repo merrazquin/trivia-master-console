@@ -4,56 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia Master Console - Run Round</title>
+    <title>QuizCommand - Run Round</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.min.css" />
-
-    <style>
-        #navigation-carousel {
-            margin-top: 30%;
-        }
-
-        #navigation-carou
-
-        #leaderboard {
-            counter-reset: leader;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            align-items: baseline;
-        }
-
-        .leaderboard-item:nth-of-type(1) {
-            color:green;
-            font-size: 1.5rem;
-        }
-        .leaderboard-item:nth-of-type(2) {
-            color:yellow; 
-            font-size: 1.25rem;
-        }
-        .leaderboard-item:nth-of-type(3) {
-            color:red;
-        }
-
-        .leaderboard-item::before {
-            counter-increment: leader;
-            content: counter(leader) ". ";
-            margin-right: 10px;
-        }
-
-
-        .middle {
-            border-bottom: 1px dotted;
-            flex-grow: 1;
-            margin: 0 5px;
-        }
-    </style>
 </head>
 
-<body class="bg-info">
-    <div class="container text-center">
-        <div id="navigation-carousel" class="carousel slide" data-keyboard="false" data-wrap="false" data-interval="false">
+<body class="bg-dark text-light">
+    <div class="container text-center mt-5">
+        <div id="display-carousel" class="carousel slide" data-keyboard="false" data-wrap="false" data-interval="false">
             <div class="carousel-inner" id="round-carousel">
                 <div class="carousel-item active">
                     <div class="sk-three-bounce loading">
@@ -73,6 +31,16 @@
                 </div>
             </div>
         </div>
+
+        <a class="carousel-control-prev" href="#display-carousel" role="button" data-slide="prev">
+            &nbsp;
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#display-carousel" role="button" data-slide="next">
+            &nbsp;
+            <span class="sr-only">Next</span>
+        </a>
+
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>

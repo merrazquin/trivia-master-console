@@ -476,8 +476,6 @@ function runRound(id) {
         $(".loaded").show();
         $(".loading").hide();
 
-        console.log(snapshot)
-
         if (snapshot.child("rounds").exists()) {
             runningRound = snapshot.val().rounds[id];
             var teams = createSortedTeamsArray(snapshot.val().teams);
@@ -485,7 +483,7 @@ function runRound(id) {
 
             // title
             $(".carousel-item:nth-of-type(1)").find("h1").text(runningRound.name);
-
+            $("#leaderboard").empty();
             // leaderboard
             if (teams.length) {
 
