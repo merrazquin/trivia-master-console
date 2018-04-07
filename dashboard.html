@@ -22,13 +22,14 @@
             <span class="navbar-text ml-auto">
                 <span id="user-info">Logging in...</span>&nbsp;
             </span>
-            <a class="btn btn-info btn-sm" href="#" role="button" id="logout">Log out</a>
+            <a class="btn btn-primary btn-sm" href="#" role="button" id="logout">Log out</a>
         </div>
     </nav>
     <!-- End Header -->
 
     <div class="jumbotron text-center">
-        <h1>QuizCommand - Dashboard</h1>
+        <h1 class="logo"><span>Quiz</span><span>Command</span></h1>
+        <h3>dashboard</h3>
     </div>
 
     <!-- Game Functionality Options Begin -->
@@ -37,13 +38,12 @@
             <div class="carousel-inner">
                 <div class="carousel-item">
                     <!-- #region Round edit -->
-                    <div class="card text-white bg-info">
+                    <div class="card text-white bg-main">
                         <div class="card-header">
                             <div class="row">
                                 <h3 class="card-title col-8">Edit Round</h3>
                                 <span class="col-4 text-right">
-                                    <button class="btn btn-default question-scroll">Add Questions</button>
-                                    <button class="btn btn-default cancel-round-edit" data-type="round">
+                                    <button class="btn btn-light cancel-round-edit" data-type="round">
                                         <span class="octicon octicon-x"></span>
                                     </button>
                                 </span>
@@ -51,21 +51,26 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-8">
-                                    <form id="round-edit-form">
+                                <div class="col-auto mb-2">
+                                    <button class="btn btn-secondary question-scroll">Add Questions</button>
+                                </div>
+                            </div>
+                            <form id="round-edit-form">
+                                <div class="form-row align-items-baseline">
+                                    <div class="col-8">
                                         <div class="form-group">
                                             <label for="roundName">Round Name</label>
                                             <input type="text" class="form-control" id="roundName" required>
                                         </div>
-                                    </form>
-                                </div>
-                                <div class="col-4">
-                                    <div class="form-group">
-                                        <label for="pointsPerQuestion">Points&nbsp;per&nbsp;question</label>
-                                        <input id="ppq" class="form-control" type="number" min="1">
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-group">
+                                            <label for="pointsPerQuestion">Points&nbsp;per&nbsp;question</label>
+                                            <input id="ppq" class="form-control" type="number" min="1">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                             <table class="table">
                                 <thead>
                                     <th scope="col">Order</th>
@@ -82,7 +87,7 @@
                     <!-- #endregion -->
 
                     <!-- #region Question -->
-                    <div id="question-addition-card" class="card text-white bg-info">
+                    <div id="question-addition-card" class="card text-white bg-main">
                         <div class="card-header">
                             <h3 class="card-title">Add Questions</h3>
                         </div>
@@ -97,7 +102,7 @@
                                     <label for="question-answer">Answer</label>
                                     <input class="form-control" type="text" id="question-answer" required>
                                 </div>
-                                <button type="submit" class="btn btn-default">Add</button>
+                                <button type="submit" class="btn btn-light">Add</button>
                             </form>
 
                             <h4 class="mt-4">Add question(s) from library</h4>
@@ -132,7 +137,7 @@
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <button type="submit" class="btn btn-default mb-2">Pull</button>
+                                        <button type="submit" class="btn btn-light mb-2">Pull</button>
                                     </div>
                                 </div>
                             </form>
@@ -146,12 +151,12 @@
                         <!-- ROUNDS -->
                         <div id="rounds-card" class="col-lg-8">
                             <!-- #region Rounds main -->
-                            <div class="card text-white bg-info default-view">
+                            <div class="card text-white bg-main default-view">
                                 <div class="card-header">
                                     <div class="row">
                                         <h3 class="card-title col-8">Rounds</h3>
                                         <span class="col-4 text-right">
-                                            <button class="btn btn-default" data-type="round" data-toggle="modal" data-target="#addModal">
+                                            <button class="btn btn-light" data-type="round" data-toggle="modal" data-target="#addModal">
                                                 <span class="octicon octicon-plus"></span>
                                             </button>
                                         </span>
@@ -181,12 +186,12 @@
                             <!-- #endregion -->
                         </div>
                         <div id="teams-card" class="col-lg-4">
-                            <div class="card text-white bg-info default-view">
+                            <div class="card text-white bg-main default-view">
                                 <div class="card-header">
                                     <div class="row">
                                         <h3 class="card-title col-8">Teams</h3>
                                         <span class="col-4 text-right">
-                                            <button class="btn btn-default" data-type="team" data-toggle="modal" data-target="#addModal">
+                                            <button class="btn btn-light" data-type="team" data-toggle="modal" data-target="#addModal">
                                                 <span class="octicon octicon-plus"></span>
                                             </button>
                                         </span>
@@ -218,12 +223,12 @@
                     </div>
                 </div>
                 <div class="carousel-item">
-                    <div class="card text-white bg-info">
+                    <div class="card text-white bg-main">
                         <div class="card-header">
                             <div class="row">
                                 <h3 class="card-title col-8">Edit Team</h3>
                                 <span class="col-4 text-right">
-                                    <button class="btn btn-default cancel-team-edit" data-type="team">
+                                    <button class="btn btn-light cancel-team-edit" data-type="team">
                                         <span class="octicon octicon-x"></span>
                                     </button>
                                 </span>
@@ -243,7 +248,7 @@
                                     <table class="table table-sm loaded">
                                         <thead>
                                             <tr>
-                                                <th scope="col" class="text-center" id="totalScore">Total Score</th>
+                                                <th scope="col" class="text-left plain" id="totalScore">Total Score</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -253,31 +258,29 @@
                                 </div>
                             </div>
                             <form id="round-score-form">
-                                <div class="form-row">
-                                    <div class="col-auto">
+                                <div class="form-row align-items-center">
+                                    <div class="col-lg-4 col-sm-6 col-12">
                                         <div class="input-group">
                                             <input id="round-score" type="number" class="form-control" placeholder="Score" required>
                                             <span class="input-group-btn">
-                                            <button class="btn btn-secondary" type="submit">Input Round Score</button>
+                                                <button class="btn btn-secondary" type="submit">Input Round Score</button>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </form>
                             <div class="row">
-                                <div class="col-6">
-                                    <div class="card-body table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Score</th>
-                                                    <th scope="col">Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="score-list">
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <table class="table table-sm mt-4">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Score</th>
+                                                <th scope="col">Delete</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="score-list">
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

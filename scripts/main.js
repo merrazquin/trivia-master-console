@@ -14,10 +14,10 @@ var database,
     currentRoundID,
     sessionToken,
     runningRound,
+    isDashboard,
+    isRunningRound,
     sessionResetCount = 0,
     sessionResetMax = 1;
-
-
 
 // Initialize Firebase
 config = {
@@ -32,8 +32,8 @@ firebase.initializeApp(config);
 database = firebase.database();
 
 $(function () {
-    var isDashboard = location.href.indexOf("dashboard.html") != -1;
-    var isRunningRound = location.href.indexOf("run-round.html") != -1;
+    isDashboard = location.href.indexOf("dashboard.html") != -1;
+    isRunningRound = location.href.indexOf("run-round.html") != -1;
     // on document ready, if we're on the dashboard page initialize the app
     if (isDashboard || isRunningRound) {
         firebase.auth().onAuthStateChanged(function (user) {
@@ -285,7 +285,7 @@ function reorderQuestions(event, ui) {
  * @param {string} customClass 
  */
 function editButton(id, customClass) {
-    var className = "btn btn-default";
+    var className = "btn btn-light";
     if (customClass) className += " " + customClass;
     return $("<button>")
         .attr("data-id", id)
@@ -299,7 +299,7 @@ function editButton(id, customClass) {
  * @param {string} customClass 
  */
 function deleteButton(id, customClass) {
-    var className = "btn btn-default";
+    var className = "btn btn-light";
     if (customClass) className += " " + customClass;
     return $("<button>")
         .attr("data-toggle", "modal")
@@ -315,7 +315,7 @@ function deleteButton(id, customClass) {
  * @param {string} customClass 
  */
 function runButton(id, customClass) {
-    var className = "btn btn-default";
+    var className = "btn btn-light";
     if (customClass) className += " " + customClass;
     return $("<button>")
         .attr("data-id", id)
@@ -330,7 +330,7 @@ function runButton(id, customClass) {
  * @param {string} customClass 
  */
 function printButton(id, customClass) {
-    var className = "btn btn-default";
+    var className = "btn btn-light";
     if (customClass) className += " " + customClass;
     return $("<button>")
         .attr("data-id", id)
@@ -369,7 +369,9 @@ function addRound(roundName) {
             pointsPerQuestion: 1
         });
         $("#addModal").modal("hide");
-        editRound(null, round.key);
+        setTimeout(function() {
+            editRound(null, round.key);
+        }, 500);
     }
 }
 
@@ -789,6 +791,14 @@ function deleteQuestion() {
 //#endregion
 
 //#region Event Handlers
+
+$(document).keyup(function(event) {
+    // if we're on the dashboard, the user hit escape, and they're not inside a textfield, go back to main view
+    if(isDashboard &&  event.target == $("body")[0] && event.keyCode == 27) {
+        $("#navigation-carousel").carousel(MAIN);
+    }
+});
+
 if ($("#questions-list").length) {
     /**
      * Handle drag & drop sorting of questions
