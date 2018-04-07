@@ -464,7 +464,7 @@ function deleteRound() {
  * Launch the "slideshow" for the round
  */
 function launchRound() {
-    window.location.href = "run-round.html?id=" + $(this).attr("data-id");
+    window.open("run-round.html?id=" + $(this).attr("data-id"), "_blank");
 }
 
 function runRound(id) {
@@ -535,7 +535,6 @@ function printRound() {
         var round = rounds[roundID];
         if (round) {
             var questions = gatherQuestions(round.questions);
-            console.log(questions)
             $("#round-print h1").text(round.name + " (ANSWER SHEET)");
             $("#round-print tbody").empty();
 
@@ -626,7 +625,6 @@ function addRoundScore(e) {
 function editScore(e) {
     var scoreID = e.target.parents("tr").attr("id");
     var val = parseInt(e.value.trim());
-    console.log(val);
 
     if (val && val !== e.old_value && !isNaN(val)) {
         e.target.html(val);
@@ -869,9 +867,7 @@ $("#addModal").on("hidden.bs.modal", function (event) {
  */
 function pullQuestion(apiOptions, callback) {
     var queryURL = "https://opentdb.com/api.php?token=" + sessionToken + "&" + apiOptions.join("&");
-    console.log(queryURL);
     $.getJSON(queryURL, function (result) {
-        console.log(result)
         switch (result.response_code) {
             case 0: // success
                 callback(result.results);
